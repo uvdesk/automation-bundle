@@ -1,0 +1,73 @@
+Webkul\UVDesk\AutomationBundle\Entity\PreparedResponses:
+    type: entity
+    table: uv_prepared_responses
+    repositoryClass: Webkul\UVDesk\AutomationBundle\Repository\PreparedResponsesRepository
+    manyToOne:
+        user:
+            targetEntity: Webkul\UVDesk\CoreBundle\Entity\UserInstance
+            joinColumn:
+                name: user_id
+                referencedColumnName: id
+                nullable: true
+                onDelete: SET NULL
+    manyToMany:
+        groups:
+            nullable: true
+            targetEntity: Webkul\UVDesk\CoreBundle\Entity\SupportGroup
+            joinTable:
+                name: uv_prepared_response_support_groups
+                joinColumns:
+                    savedReply_id:
+                        referencedColumnName: id
+                        onDelete : cascade
+                inverseJoinColumns:
+                    group_id:
+                        referencedColumnName: id
+                        onDelete : cascade
+        teams:
+            nullable: true        
+            targetEntity: Webkul\UVDesk\CoreBundle\Entity\SupportTeam
+            joinTable:
+                name: uv_prepared_response_support_teams
+                joinColumns:
+                    savedReply_id:
+                        referencedColumnName: id
+                        onDelete : cascade                        
+                inverseJoinColumns:
+                    subgroup_id:
+                        referencedColumnName: id
+                        onDelete : cascade
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 255
+        description:
+            type: string
+            length: 2500
+            nullable: true
+        type:
+            type: string
+            length: 255
+            nullable: true
+            options:
+                default: public
+        actions:
+            type: array
+        status:
+            type: boolean
+            nullable: true
+            options:
+                default: 1
+        dateAdded:
+            type: datetime
+        dateUpdated:
+            type: datetime
+    lifecycleCallbacks: 
+        prePersist: [ setCreatedAtValue ]
+        preUpdate: [ setUpdatedAtValue ]   

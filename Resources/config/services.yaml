@@ -1,0 +1,19 @@
+services:
+    Webkul\UVDesk\AutomationBundle\Fixtures\:
+        resource: '../../Fixtures/*'
+        arguments: ['@service_container', '@doctrine.orm.entity_manager']
+        tags: ['doctrine.fixture.orm']
+    
+    uvdesk.automations:
+        public: true
+        class: Webkul\UVDesk\AutomationBundle\Services\AutomationService
+        arguments: ['@service_container', '@request_stack', '@doctrine.orm.entity_manager']
+    
+    Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener:
+        arguments: ['@service_container', '@doctrine.orm.entity_manager']
+        tags:
+            - { name: kernel.event_listener, event: uvdesk.automation.workflow.execute, method: executeWorkflow }
+    
+    workflow.listener.alias:
+        alias: Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener
+        public: true

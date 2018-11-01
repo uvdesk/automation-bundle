@@ -1,0 +1,69 @@
+# Prepare Responses Routers
+prepare_response_action:
+    path:     /prepared-responses
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponse::prepareResponseList
+    defaults: { panelId: 'productivity'}
+
+prepare_response_delete:
+    path:     /prepared-responses/delete/{id}
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponseXHR::prepareResponseDeleteXhr
+    defaults: { panelId: 'productivity', id: 0}
+
+prepare_response_list_xhr:
+    path:     /prepared-responses/ajax
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponseXHR::prepareResponseListXhr
+    defaults: { panelId: 'productivity'}
+
+prepare_response_addaction:
+    path:     /prepared-responses/add
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponse::createPrepareResponse
+    defaults: { panelId: 'productivity'}
+
+prepare_response_editaction:
+    path:     /prepared-responses/edit/{id}
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponse::editPrepareResponse
+    defaults: { panelId: 'productivity', id: 0 }
+
+# Workflow Resources
+helpdesk_member_workflow_collection:
+    path:     /workflows
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\Workflow::listWorkflowCollection
+    defaults: { panelId: 'productivity' }
+    
+workflowslist_xhr:
+    path:     /workflows/xhr
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\WorkflowXHR::workflowsListXhr
+    defaults: { panelId: 'productivity' }
+
+workflows_addaction:
+    path:     /workflow/add
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\Workflow::createWorkflow
+    defaults: { panelId: 'productivity' }
+
+workflows_editaction:
+    path:     /workflow/edit/{id}
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\Workflow::editWorkflow
+    defaults: { panelId: 'productivity'}
+
+workflows_xhraction:
+    path:     /workflow-ajax/{id}
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\WorkflowXHR::WorkflowsxhrAction
+    defaults: { panelId: 'productivity', id: 0 }
+
+# Events
+webkul_events_xhr:
+    path:     /actions/{entity}/{event}
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\Actions::getEntity
+    defaults:   { entity: default, event: null }       
+         
+# Conditions       
+webkul_conditions_actions_xhr:
+    path:     /conditions/{entity}
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\Conditions::getEntity
+    defaults:   { entity: default}    
+
+# Actions
+webkul_actions_xhr:
+    path:     /actions/{entity}
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\Actions::getEntity
+    defaults:   { entity: default} 

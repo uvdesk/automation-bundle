@@ -1,0 +1,44 @@
+Webkul\UVDesk\AutomationBundle\Entity\Workflow:
+    type: entity
+    table: uv_workflow
+    repositoryClass: Webkul\UVDesk\AutomationBundle\Repository\WorkflowRepository
+    oneToMany:
+        workflowEvents:
+            targetEntity: Webkul\UVDesk\AutomationBundle\Entity\WorkflowEvents
+            mappedBy: workflow
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 191
+        description:
+            type: text
+            nullable: true
+        conditions:
+            type: array
+        actions:
+            type: array
+        sortOrder:
+            type: integer
+            nullable: true
+        isPredefind:
+            type: boolean
+            options:
+                default: true
+        status:
+            type: boolean
+            options:
+                default: true
+        dateAdded:
+            type: datetime
+        dateUpdated:
+            type: datetime
+    lifecycleCallbacks: 
+        prePersist: [ setCreatedAtValue ]
+        preUpdate: [ setUpdatedAtValue ]
+

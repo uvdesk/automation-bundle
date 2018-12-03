@@ -44,7 +44,7 @@ class WorkflowListener
 
         return null;
     }
-
+    
     public function getRegisteredWorkflowEvents()
     {
         return $this->registeredWorkflowEvents;
@@ -65,25 +65,23 @@ class WorkflowListener
                 $totalEvaluatedConditions = 0;
 
                 foreach ($this->evaluateWorkflowConditions($workflow) as $workflowCondition) {
-                    dump($workflowCondition);
-                    die;
-                    // $totalEvaluatedConditions++;
+                   
+                    $totalEvaluatedConditions++;
 
-                    // if (isset($workflowCondition['type']) && $this->checkCondition($workflowCondition)) {
-                    //     $totalConditions++;
-                    // }
+                    if (isset($workflowCondition['type']) && $this->checkCondition($workflowCondition, $event->getArgument('entity'))) {
+                        $totalConditions++;
+                    }
 
-                    // if (isset($workflowCondition['or'])) {
-                    //     foreach ($workflowCondition['or'] as $orCondition) {
-                    //         $flag = $this->checkCondition($orCondition);
-                    //         if ($flag) {
-                    //             $totalConditions++;
-                    //         }
-                    //     }
-                    // }
+                    if (isset($workflowCondition['or'])) {
+                        foreach ($workflowCondition['or'] as $orCondition) {
+                            $flag = $this->checkCondition($orCondition, $event->getArgument('entity'));
+                            if ($flag) {
+                                $totalConditions++;
+                            }
+                        }
+                    }
                 }
-
-                if ($totalEvaluatedConditions > 0 || $totalConditions >= $totalEvaluatedConditions) {
+                if ($totalEvaluatedConditions == 0 || $totalConditions >= $totalEvaluatedConditions) {
                     $this->applyWorkflowActions($workflow , $event->getArgument('entity'));
                 }
             }
@@ -124,172 +122,191 @@ class WorkflowListener
 
             foreach ($this->getRegisteredWorkflowActions() as $workflowAction) {
                 if ($workflowAction->getId() == $attributes['type']) {
-                    $workflowAction->applyAction($this->container, $entity, $attributes['value']);
+                    $workflowAction->applyAction($this->container, $entity, isset($attributes['value'])? $attributes['value']: '');
                 }
             }
         }
     }
-    // Apply manual workflow(Prepared response)
-    public function applyResponse($event , $object) {
-        if($object instanceof Ticket && $object->getIsTrashed())
-            return;
-        $this->object = $object;
-        $translator = $this->container->get('translator');
-        foreach($event->getActions() as $action) {
-            switch ($action['type']) {
-                case 'uvdesk.ticket.update_priority':
-                    if( ($object instanceof Ticket || $object instanceof Task) && $action['value'] ) {
-                        $priority = $this->entityManager->getRepository('UVDeskCoreBundle:TicketPriority')->find($action['value']);
-                        $object->setPriority($priority);
-                        $this->entityManager->persist($object);
-                        $this->entityManager->flush();
+    public function checkCondition($condition, $entity) {
+        $flag = false;
+        switch ($condition['type']) {
+            case 'from_mail':
+                if(isset($condition['value']) && $entity instanceof Ticket)
+                    $flag = $this->match($condition['match'],$entity->getCustomer()->getEmail(),$condition['value']);
+                break;
+            case 'to_mail':
+                if(isset($condition['value']) && $entity instanceof Ticket && $entity->getMailboxEmail())
+                    $flag = $this->match($condition['match'],$entity->getMailboxEmail(),$condition['value']);
+                break;
+            case 'subject':
+                if(isset($condition['value']) && ($entity instanceof Ticket || $entity instanceof Task))
+                    $flag = $this->match($condition['match'],$entity->getSubject(),$condition['value']);
+                break;
+            case 'description':
+                if(isset($condition['value']) && $entity instanceof Ticket) {
+                    $createThread = $this->container->get('ticket.service')->getCreateReply($entity->getId(),false);
+                    $createThread['reply'] = rtrim(strip_tags($createThread['reply']), "\n" );
+                    $flag = $this->match($condition['match'],rtrim($createThread['reply']),$condition['value']);
+                }
+                break;
+            case 'subject_or_description':
+                if(isset($condition['value']) && $entity instanceof Ticket) {
+                    $flag = $this->match($condition['match'],$entity->getSubject(),$condition['value']);
+                    $createThread = $this->container->get('ticket.service')->getCreateReply($entity->getId(),false);
+                    if(!$flag) {
+                        $createThread = $this->container->get('ticket.service')->getCreateReply($entity->getId(),false);
+                        $createThread['reply'] = rtrim(strip_tags($createThread['reply']), "\n" );
+                        $flag = $this->match($condition['match'],$createThread['reply'],$condition['value']);
                     }
-                    break;
-                case 'uvdesk.ticket.update_type':
-                    if($object instanceof Ticket && $action['value']) {
-                        $type = $this->entityManager->getRepository('UVDeskCoreBundle:TicketType')->find($action['value']);
-                        if($type) {
-                            $object->setType($type);
-                            $this->entityManager->persist($object);
-                            $this->entityManager->flush();
+                }
+                break;
+            case 'TicketPriority':
+                if(isset($condition['value']) && ($entity instanceof Ticket))
+                    $flag = $this->match($condition['match'],$entity->getPriority()->getId(),$condition['value']);
+                break;
+            case 'TicketType':
+                if(isset($condition['value']) && $entity instanceof Ticket) {
+                    $typeId = $entity->getType() ? $entity->getType()->getId() : 0;
+                    $flag = $this->match($condition['match'],$typeId,$condition['value']);
+                }
+                break;
+            case 'TicketStatus':
+                if(isset($condition['value']) && $entity instanceof Ticket)
+                    $flag = $this->match($condition['match'],$entity->getStatus()->getId(),$condition['value']);
+                break;
+            case 'stage':
+                if(isset($condition['value']) && $entity instanceof Task)
+                    $flag = $this->match($condition['match'],$entity->getStage()->getId(),$condition['value']);
+                break;
+            case 'source':
+                if(isset($condition['value']) && $entity instanceof Ticket)
+                    $flag = $this->match($condition['match'],$entity->getSource(),$condition['value']);
+                break;
+            case 'created':
+                if(isset($condition['value']) && ($entity instanceof Ticket || $entity instanceof Task)) {
+                    $date = date_format($entity->getCreatedAt(),"d-m-Y h:ia");
+                    $flag = $this->match($condition['match'],$date,$condition['value']);
+                }
+                break;
+            case 'agent':
+                if(isset($condition['value']) && $entity instanceof Ticket && $entity->getAgent())
+                    $flag = $this->match($condition['match'], $entity->getAgent()->getId(), (($condition['value'] == 'actionPerformingAgent') ? ($this->container->get('user.service')->getCurrentUser() ? $this->container->get('user.service')->getCurrentUser()->getId() : 0) : $condition['value']));
+                break;
+            case 'group':
+                if(isset($condition['value']) && $entity instanceof Ticket)  {
+                    $groupId = $entity->getSupportGroup() ? $entity->getSupportGroup()->getId() : 0;
+                    $flag = $this->match($condition['match'],$groupId,$condition['value']);
+                }
+                break;
+            case 'team':
+                if(isset($condition['value']) && $entity instanceof Ticket)  {
+                    $subGroupId = $entity->getSupportTeam() ? $entity->getSupportTeam()->getId() : 0;
+                    $flag = $this->match($condition['match'],$subGroupId,$condition['value']);
+                }
+                break;
+            case 'customer_name':
+                if(isset($condition['value']) && $entity instanceof Ticket) {
+                    $lastThread = $this->container->get('ticket.service')->getTicketLastThread($entity->getId());
+                    $flag = $this->match($condition['match'],$lastThread->getFullname(),$condition['value']);
+                }
+                break;
+            case 'customer_email':
+                if(isset($condition['value']) && $entity instanceof Ticket) {
+                    $flag = $this->match($condition['match'],$entity->getCustomer()->getEmail(),$condition['value']);
+                }
+                break;
+            case strpos($condition['type'], 'customFields[') == 0:
+                $ticketCfValues = $entity->getCustomFieldValues()->getValues();
+                $value = null;
+                foreach($ticketCfValues as $cfValue) {
+                    $mainCf = $cfValue->getTicketCustomFieldsValues();
+                    if($condition['type'] == 'customFields[' . $mainCf->getId() . ']' ) {
+                        if( in_array($mainCf->getFieldType(), ['select', 'radio', 'checkbox']) ) {
+                           $value = json_decode($cfValue->getValue(), true);
                         } else {
-                            // Ticket Type Not Found. Disable Workflow/Prepared Response
-                            $this->disableEvent($event, $object);
+                            $value = trim($cfValue->getValue(), '"');
                         }
+                       break;
                     }
-                    break;
-                case 'uvdesk.ticket.update_status':
-                    if($object instanceof Ticket && $action['value']) {
-                        $status = $this->entityManager->getRepository('UVDeskCoreBundle:TicketStatus')->find($action['value']);
-                        $object->setStatus($status);
-                        $this->entityManager->persist($object);
-                        $this->entityManager->flush();
-                        //$this->container->get('ticket.service')->calculateResolveTime($object);
-                    }
-                    break;
-                case 'uvdesk.ticket.update_tag':
-                    if($object instanceof Ticket) {
-                        $isAlreadyAdded = 0;
-                        $tags = $this->container->get('ticket.service')->getTicketTagsById($object->getId());
-                        if(is_array($tags)) {
-                            foreach ($tags as $tag) {
-                                if($tag['id'] == $action['value'])
-                                    $isAlreadyAdded = 1;
-                            }
-                        }
-                        if(!$isAlreadyAdded) {
-                            $tag = $this->entityManager->getRepository('UVDeskCoreBundle:Tag')->find($action['value']);
-                            if($tag) {
-                                $object->addSupportTag($tag);
-                                $this->entityManager->persist($object);
-                                $this->entityManager->flush();
-                            } else {
-                                // Ticket Tag Not Found. Disable Workflow/Prepared Response
-                                //$this->disableEvent($event, $object);
-                            }
-                        }
-                    }
-                    break;
-                case 'uvdesk.agent.add_note':
-                    if($object instanceof Ticket) {
-                        $data = array();
-                        $data['ticket'] = $object;
-                        $data['threadType'] = 'note';
-                        $data['source'] = 'website';
-                        $data['message'] = $action['value']; 
-                        $data['createdBy'] = 'System';
-                        $this->container->get('ticket.service')->createThread($object,$data);
-                    }
-                    break;
-                // case 'mail_last_collaborator':
-                //     if($object instanceof Ticket) {
-                //         $emailTemplate = $this->container->get('email.service')->getEmailTemplate($action['value']);
-                //         if(count($object->getCollaborators()) && $emailTemplate) {
-                //             $mailData = array();
-                //             $createThread = $this->container->get('ticket.service')->getCreateReply($object->getId(),false);
-                //             $mailData['references'] = $createThread['messageId'];
-                //             $mailData['replyTo'] = $object->getUniqueReplyTo();
-                //             if(!$object->lastCollaborator) {
-                //                 try {
-                //                     $object->lastCollaborator = $object->getCollaborators()[ -1 + count($object->getCollaborators()) ];
-                //                 } catch(\Exception $e) {
-                //                 }
-                //             }
-                //             if($object->lastCollaborator) {
-                //                 $mailData['email'] = $object->lastCollaborator->getEmail();
-                //                 $placeHolderValues = $this->container->get('ticket.service')->getTicketPlaceholderValues($object,'customer');
-                //                 $mailData['subject'] = $this->container->get('email.service')
-                //                                             ->getProcessedSubject($emailTemplate->getSubject(),$placeHolderValues);
-                //                 $mailData['message'] = $this->container->get('email.service')
-                //                                             ->getProcessedTemplate($emailTemplate->getMessageInline(),$placeHolderValues);
-                //                 $this->sendMail($mailData);
-                //             }
-                //         }
-                //     }
-                //     break;
-                case 'uvdesk.ticket.assign_agent':
-                    if($object instanceof Ticket) {
-                        if ($action['value'] == 'responsePerforming' && is_object($currentUser = $this->container->get('security.context')->getToken()->getUser())) {
-                            $agent = $currentUser;
-                        } else {
-                            $agent = $this->entityManager->getRepository('UVDeskCoreBundle:User')->find($action['value']);
-                            if ($agent) {
-                                $agent = $this->entityManager->getRepository('UVDeskCoreBundle:User')->findOneBy(array('email' => $agent->getEmail()));
-                            }
-                        }
-                        if ($agent) {
-                            if($this->entityManager->getRepository('UVDeskCoreBundle:User')->findOneBy(array('id' => $agent->getId()))) {
-                                $object->setAgent($agent);
-                                $this->entityManager->persist($object);
-                                $this->entityManager->flush();
-                            }
-                        } else {
-                            // Agent Not Found. Disable Workflow/Prepared Response
-                            $this->disableEvent($event, $object);
-                        }
-                    }
-                    break;
-                    case 'uvdesk.ticket.assign_group':
-                    if($object instanceof Ticket) {
-                        $group = $this->entityManager->getRepository('UVDeskCoreBundle:SupportGroup')->find($action['value']);
-                        if($group) {
-                            $object->setSupportGroup($group);
-                            $this->entityManager->persist($object);
-                            $this->entityManager->flush();
-                        } else {
-                            // User Group Not Found. Disable Workflow/Prepared Response
-                            $this->disableEvent($event, $object);
-                        }
-                    }
-                    break;
-                case 'uvdesk.ticket.assign_team':
-                    if($object instanceof Ticket) {
-                        $subGroup = $this->entityManager->getRepository('UVDeskCoreBundle:SupportTeam')->find($action['value']);
-                        if($subGroup) {
-                            $object->setSupportTeam($subGroup);
-                            $this->entityManager->persist($object);
-                            $this->entityManager->flush();
-                        } else {
-                            // User Sub Group Not Found. Disable Workflow/Prepared Response
-                            $this->disableEvent($event, $object);
-                        }
-                    }
-                    break;
-                case 'uvdesk.ticket.delete':
-                    if($object instanceof Ticket) {
-                        $this->entityManager->remove($object);
-                        $this->entityManager->flush();
-                    }
-                    break;
-                case 'uvdesk.ticket.mark_spam':
-                    if($object instanceof Ticket) {
-                        $status = $this->entityManager->getRepository('UVDeskCoreBundle:TicketStatus')->find(6);
-                        $object->setStatus($status);
-                        $this->entityManager->persist($object);
-                        $this->entityManager->flush();
-                    }
-                    break;
-            }
+                }
+                if(isset($condition['value']) && $entity instanceof Ticket) {
+                    $flag = $this->match($condition['match'], !empty($value) ? $value : '', $condition['value']);
+                }
+                break;
+        }
+        return $flag;
+    }
+    public function match($condition,$haystack,$needle) {
+        //remove tags
+        if('string' == gettype($haystack)) {
+            $haystack = strip_tags($haystack);
+        }
+        switch ($condition) {
+            case 'is':
+                return is_array($haystack) ? in_array($needle, $haystack) : $haystack == $needle;
+            case 'isNot':
+                return is_array($haystack) ? !in_array($needle, $haystack) : $haystack != $needle;
+            case 'contains':
+                return strripos($haystack,$needle) !== false ? true : false;
+            case 'notContains':
+                return strripos($haystack,$needle) === false ? true : false;
+            case 'startWith':
+                return $needle === "" || strripos($haystack, $needle, -strlen($haystack)) !== FALSE;
+            case 'endWith':
+                return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && stripos($haystack, $needle, $temp) !== FALSE);
+            case 'before':
+                $createdTimeStamp = date('Y-m-d',strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d',strtotime($needle." 23:59:59"));
+                return $createdTimeStamp < $conditionTimeStamp ? true : false;
+            case 'beforeOn':
+                $createdTimeStamp = date('Y-m-d',strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d',strtotime($needle." 23:59:59"));
+                return ($createdTimeStamp < $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp) ? true : false;
+            case 'after':
+                $createdTimeStamp = date('Y-m-d',strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d',strtotime($needle." 23:59:59"));
+                return $createdTimeStamp > $conditionTimeStamp ? true : false;
+            case 'afterOn':
+                $createdTimeStamp = date('Y-m-d',strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d',strtotime($needle." 23:59:59"));
+                return $createdTimeStamp > $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp ? true : false;
+            case 'beforeDateTime':
+                $createdTimeStamp = date('Y-m-d h:i:s',strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d h:i:s',strtotime($needle));
+                return $createdTimeStamp < $conditionTimeStamp ? true : false;
+            case 'beforeDateTimeOn':
+                $createdTimeStamp = date('Y-m-d h:i:s',strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d h:i:s',strtotime($needle));
+                return ($createdTimeStamp < $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp) ? true : false;
+            case 'afterDateTime':
+                $createdTimeStamp = date('Y-m-d h:i:s',strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d h:i:s',strtotime($needle));
+                return $createdTimeStamp > $conditionTimeStamp ? true : false;
+            case 'afterDateTimeOn':
+                $createdTimeStamp = date('Y-m-d h:i:s',strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d h:i:s',strtotime($needle));
+                return $createdTimeStamp > $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp ? true : false;
+            case 'beforeTime':
+                $createdTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$haystack));
+                $conditionTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$needle));
+                return $createdTimeStamp < $conditionTimeStamp ? true : false;
+            case 'beforeTimeOn':
+                $createdTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$haystack));
+                $conditionTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$needle));
+                return ($createdTimeStamp < $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp) ? true : false;
+            case 'afterTime':
+                $createdTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$haystack));
+                $conditionTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$needle));
+                return $createdTimeStamp > $conditionTimeStamp ? true : false;
+            case 'afterTimeOn':
+                $createdTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$haystack));
+                $conditionTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$needle));
+                return $createdTimeStamp > $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp ? true : false;
+            case 'greaterThan':
+                return !is_array($haystack) && $needle > $haystack;
+            case 'lessThan':
+                return !is_array($haystack) && $needle < $haystack;
         }
     }
+
 }

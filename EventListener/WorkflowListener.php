@@ -14,7 +14,7 @@ class WorkflowListener
 {
     private $container;
     private $entityManager;
-    public $notePlaceholders = array();
+    public  $notePlaceholders = array();
     private $registeredWorkflowEvents = [];
     private $registeredWorkflowActions = [];
 

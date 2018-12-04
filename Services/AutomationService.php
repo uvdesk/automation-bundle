@@ -22,7 +22,7 @@ class AutomationService
         $this->entityManager = $entityManager;
     }
 
-    public function getTicketEvents()
+    public function getWorkflowEvents()
     {
         return [
             FunctionalGroup::AGENT => 'Agent',
@@ -31,7 +31,7 @@ class AutomationService
         ];
     }
 
-    public function getTicketEventValues()
+    public function getWorkflowEventValues()
     {
         $ticketEventCollection = [];
 
@@ -48,7 +48,7 @@ class AutomationService
         return $ticketEventCollection;
     }
 
-    public function getTicketConditions()
+    public function getWorkflowConditions()
     {
         $conditions = [
             'ticket' => [
@@ -139,7 +139,7 @@ class AutomationService
         return $conditions;
     }
 
-    public function getTicketMatchConditions()
+    public function getWorkflowMatchConditions()
     {
         return [
             'email' => [
@@ -275,10 +275,9 @@ class AutomationService
         ];
     }
 
-    public function getTicketActions($force = false)
+    public function getWorkflowActions($force = false)
     {
         $ticketActionCollection = [];
-
         foreach ($this->container->get('workflow.listener.alias')->getRegisteredWorkflowActions() as $workflowDefinition) {
             $functionalGroup = $workflowDefinition->getFunctionalGroup();
 
@@ -287,6 +286,60 @@ class AutomationService
             }
 
             $ticketActionCollection[$functionalGroup][$workflowDefinition->getId()] = $workflowDefinition->getDescription();
+        }
+
+        $actionRoleArray = [
+
+             'ticket->TicketPriority' => 'ROLE_AGENT_UPDATE_TICKET_PRIORITY',
+             'ticket->TicketType'     => 'ROLE_AGENT_UPDATE_TICKET_TYPE',
+             'ticket->TicketStatus'   => 'ROLE_AGENT_UPDATE_TICKET_STATUS',
+             'ticket->tag'            => 'ROLE_AGENT_ADD_TAG',
+             'ticket->note'           => 'ROLE_AGENT_ADD_NOTE',
+             'ticket->assign_agent'   => 'ROLE_AGENT_ASSIGN_TICKET',
+             'ticket->assign_group'   => 'ROLE_AGENT_ASSIGN_TICKET_GROUP',
+             'ticket->assign_team'    => 'ROLE_AGENT_ASSIGN_TICKET_GROUP',
+             'ticket->mail_agent'     => 'ROLE_AGENT',
+             'ticket->mail_group'     => 'ROLE_AGENT_MANAGE_GROUP',
+             'ticket->mail_team'      => 'ROLE_AGENT_MANAGE_SUB_GROUP',
+             'ticket->mail_customer'  => 'ROLE_AGENT',
+             'ticket->mail_last_collaborator' => 'ROLE_AGENT',
+             'ticket->delete_ticket'  => 'ROLE_AGENT_DELETE_TICKET',
+             'ticket->mark_spam'      => 'ROLE_AGENT_UPDATE_TICKET_STATUS',
+
+             'task->reply' => 'ROLE_AGENT',
+             'task->mail_agent' => 'ROLE_AGENT',
+             'task->mail_members' => 'ROLE_AGENT',
+             'task->mail_last_member' => 'ROLE_AGENT',
+
+             'customer->mail_customer' => 'ROLE_AGENT',
+
+             'agent->mail_agent' => 'ROLE_AGENT',
+             'agent->ticket_transfer' => 'ROLE_AGENT_ASSIGN_TICKET',
+             'agent->task_transfer' => 'ROLE_AGENT_EDIT_TASK',
+        ];
+
+        // $resultArray = [];
+        // foreach($actionRoleArray as $action => $role) {
+        //     if($role == 'ROLE_AGENT' || $this->container->get('user.service')->checkPermission($role) || $force) {
+        //         $actionPath = explode('->', $action);
+        //         $resultArray[$actionPath[0]][$actionPath[1]] = $actionArray[$actionPath[0]][$actionPath[1]];
+        //     }
+        // }
+
+        return $ticketActionCollection;
+    }
+
+    public function getPreparedResponseActions($force = false)
+    {
+        $ticketActionCollection = [];
+        foreach ($this->container->get('prepared_response.listener.alias')->getRegisteredPreparedResponseActions() as $preparedResponseDefinition) {
+            $functionalGroup = $preparedResponseDefinition->getFunctionalGroup();
+
+            if (!isset($ticketActionCollection[$functionalGroup])) {
+                $ticketActionCollection[$functionalGroup] = [];
+            }
+
+            $ticketActionCollection[$functionalGroup][$preparedResponseDefinition->getId()] = $preparedResponseDefinition->getDescription();
         }
 
         $actionRoleArray = [

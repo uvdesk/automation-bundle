@@ -23,6 +23,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: uvdesk.automation.prepared_response.execute, method: executePreparedResponse }
     
-    workflow.listener.alias:
+    prepared_response.listener.alias:
         alias: Webkul\UVDesk\AutomationBundle\EventListener\PreparedResponseListener
         public: true

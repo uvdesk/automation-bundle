@@ -25,7 +25,7 @@ class Workflow extends Controller
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
-        return $this->render('@UVDeskAutomation//Default//workflowList.html.twig');
+        return $this->render('@UVDeskAutomation//Workflow//workflowList.html.twig');
     }
 
     // Creating workflow
@@ -158,7 +158,7 @@ class Workflow extends Controller
             ];
         }
       
-        return $this->render('@UVDeskAutomation//Default//createWorkflow.html.twig', array(
+        return $this->render('@UVDeskAutomation//Workflow//createWorkflow.html.twig', array(
             'form' => $form->createView(),
             'error' => $error,
             'formerror' => $formerror,
@@ -328,7 +328,7 @@ class Workflow extends Controller
             ];
         }
       
-        return $this->render('@UVDeskAutomation//Default//editWorkflow.html.twig', array(
+        return $this->render('@UVDeskAutomation//Workflow//editWorkflow.html.twig', array(
             'form' => $form->createView(),
             'error' => $error,
             'formerror' => $formerror,

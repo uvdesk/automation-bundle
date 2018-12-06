@@ -27,7 +27,7 @@ class PreparedResponse extends Controller
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
-        return $this->render('@UVDeskAutomation//Default//preparedResponses.html.twig');
+        return $this->render('@UVDeskAutomation//PreparedResponse//preparedResponses.html.twig');
     }
 
     public function createPrepareResponse(Request $request)
@@ -171,7 +171,7 @@ class PreparedResponse extends Controller
             ];
         }
 
-        return $this->render('@UVDeskAutomation//Default//createPreparedResponse.html.twig', array(
+        return $this->render('@UVDeskAutomation//PreparedResponse//createPreparedResponse.html.twig', array(
             'form' => $form->createView(),
             'error' => $error,
             'formerror' => $formerror,
@@ -345,7 +345,7 @@ class PreparedResponse extends Controller
             ];
         }
 
-        return $this->render('@UVDeskAutomation//Default//createPreparedResponse.html.twig', array(
+        return $this->render('@UVDeskAutomation//PreparedResponse//createPreparedResponse.html.twig', array(
             'form' => $form->createView(),
             'error' => $error,
             'formerror' => $formerror,

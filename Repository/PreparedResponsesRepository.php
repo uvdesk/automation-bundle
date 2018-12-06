@@ -77,7 +77,7 @@ class PreparedResponsesRepository extends EntityRepository
         return $json;
     }
 
-    public function getPreparedResponse($id, $container) 
+    public function getPreparedResponse($id) 
     {
         $json = array();
         $qb = $this->getEntityManager()->createQueryBuilder();

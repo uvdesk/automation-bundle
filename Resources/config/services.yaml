@@ -17,3 +17,12 @@ services:
     workflow.listener.alias:
         alias: Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener
         public: true
+    
+    Webkul\UVDesk\AutomationBundle\EventListener\PreparedResponseListener:
+        arguments: ['@service_container', '@doctrine.orm.entity_manager']
+        tags:
+            - { name: kernel.event_listener, event: uvdesk.automation.prepared_response.execute, method: executePreparedResponse }
+    
+    prepared_response.listener.alias:
+        alias: Webkul\UVDesk\AutomationBundle\EventListener\PreparedResponseListener
+        public: true

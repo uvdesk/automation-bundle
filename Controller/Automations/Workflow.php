@@ -163,9 +163,6 @@ class Workflow extends Controller
             'error' => $error,
             'formerror' => $formerror,
             'formData' => $formData,
-            //'list_items' => $this->getListItems($request),
-            //'information_items' => $this->getRightSidebarInfoItems($request),
-            //'workflowAction' => $this->get('user.service')->checkCompanyPermission('workflow')
         ));
     }
 
@@ -193,7 +190,7 @@ class Workflow extends Controller
                 ];
 
                 foreach ($workflow->getWorkflowEvents() as $event) {
-                    $eventDefinition = $this->get('workflow.listener.alias')->getRegisteredWorkflowEvent($event->getEvent());
+                    $eventDefinition = $this->get('uvdesk.automations.workflows')->getRegisteredWorkflowEvent($event->getEvent());
 
                     if (!empty($eventDefinition)) {
                         $formData['events'][] = [
@@ -333,8 +330,6 @@ class Workflow extends Controller
             'error' => $error,
             'formerror' => $formerror,
             'formData' => $formData,
-            //'list_items' => $this->getListItems($request),
-            //'information_items' => $this->getRightSidebarInfoItems($request),
         ));
     }
 

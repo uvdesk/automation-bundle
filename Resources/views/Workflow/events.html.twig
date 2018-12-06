@@ -31,8 +31,8 @@
 	}
 
 	sB.eventRow = sB.PrevEvent = 0;
-	sB.JsonEvents = JSON.parse("{{ uvdesk_automations.getTicketEvents() | json_encode | e('js') }}");
-	sB.MatchEvents = JSON.parse("{{ uvdesk_automations.getTicketEventValues() | json_encode | e('js') }}");
+	sB.JsonEvents = JSON.parse("{{ uvdesk_automations.getWorkflowEvents() | json_encode | e('js') }}");
+	sB.MatchEvents = JSON.parse("{{ uvdesk_automations.getWorkflowEventValues() | json_encode | e('js') }}");
 
 	sB.EventSelectView = Backbone.View.extend({
 		tagName: 'div',

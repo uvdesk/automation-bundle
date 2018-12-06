@@ -27,7 +27,7 @@ class PreparedResponse extends Controller
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
-        return $this->render('@UVDeskAutomation//Default//preparedResponses.html.twig');
+        return $this->render('@UVDeskAutomation//PreparedResponse//preparedResponses.html.twig');
     }
 
     public function createPrepareResponse(Request $request)
@@ -171,15 +171,11 @@ class PreparedResponse extends Controller
             ];
         }
 
-        return $this->render('@UVDeskAutomation//Default//createPreparedResponse.html.twig', array(
+        return $this->render('@UVDeskAutomation//PreparedResponse//createPreparedResponse.html.twig', array(
             'form' => $form->createView(),
             'error' => $error,
             'formerror' => $formerror,
             'formData' => $formData,
-            //'list_items' => $this->getListItems($request),
-            //'information_items' => $this->getRightSidebarInfoItems($request),
-            //'workflowAction' => $this->get('user.service')->checkCompanyPermission('workflow'),
-            //'forcedActions' => !(empty($workflow) || $workflow->getUser()->getId() == $this->get('user.service')->getUserDetailById($this->getCurrentUser()->getId(), $this->get('user.service')->getCurrentCompany()->getId())->getId() || $this->get('user.service')->checkPermission('ROLE_ADMIN')),
         ));
     }
 
@@ -345,15 +341,11 @@ class PreparedResponse extends Controller
             ];
         }
 
-        return $this->render('@UVDeskAutomation//Default//createPreparedResponse.html.twig', array(
+        return $this->render('@UVDeskAutomation//PreparedResponse//createPreparedResponse.html.twig', array(
             'form' => $form->createView(),
             'error' => $error,
             'formerror' => $formerror,
             'formData' => $formData,
-            //'list_items' => $this->getListItems($request),
-            //'information_items' => $this->getRightSidebarInfoItems($request),
-            //'workflowAction' => $this->get('user.service')->checkCompanyPermission('workflow'),
-            //'forcedActions' => !(empty($workflow) || $workflow->getUser()->getId() == $this->get('user.service')->getUserDetailById($this->getCurrentUser()->getId(), $this->get('user.service')->getCurrentCompany()->getId())->getId() || $this->get('user.service')->checkPermission('ROLE_ADMIN')),
         ));
     }
 

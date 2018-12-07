@@ -207,8 +207,9 @@ class WorkflowListener
             case 'customer_name':
                 if(isset($condition['value']) && $entity instanceof Ticket) {
                     $lastThread = $this->container->get('ticket.service')->getTicketLastThread($entity->getId());
-                    $flag = $this->match($condition['match'],$lastThread->getFullname(),$condition['value']);
+                    $flag = $this->match($condition['match'],$ticket->getCustomer()->getFullName(),$condition['value']);
                 }
+                
                 break;
             case 'customer_email':
                 if(isset($condition['value']) && $entity instanceof Ticket) {

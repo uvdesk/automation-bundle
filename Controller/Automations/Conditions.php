@@ -40,9 +40,13 @@ class Conditions extends Controller
                         break;
                     case 'TicketType':
                         $results = $this->container->get('ticket.service')->getTypes();
+                        $json = json_encode($results);
+                        $results = [];
                         break;
                     case 'group':
                         $results = $this->container->get('user.service')->getSupportGroups();
+                        $json = json_encode($results);
+                        $results = [];
                         break;
                     case 'team':
                         $results = $this->container->get('user.service')->getSupportTeams();
@@ -79,6 +83,8 @@ class Conditions extends Controller
                         break;
                     case 'stage':
                         $results = $this->container->get('task.service')->getStages();
+                        $json = json_encode($results);
+                        $results = [];
                         break;
                     case 'source':
                         $allSources = $this->container->get('ticket.service')->getAllSources();
@@ -100,7 +106,8 @@ class Conditions extends Controller
                                         ];
                            // }
                         };
-
+                        $json = json_encode($results);
+                        $results = [];
                         break;
                     case $this->isCustomFieldEntity($request->attributes->get('entity') ):
                         $cfId = str_replace(['customFields[', ']'], ['', ''], $request->attributes->get('entity') );
@@ -117,7 +124,6 @@ class Conditions extends Controller
                                 ];
                             }
                         }
-
                         break;                        
                     default:
                         $json = '{}';

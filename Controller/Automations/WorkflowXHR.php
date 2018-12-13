@@ -169,7 +169,7 @@ class WorkflowXHR extends Controller
         foreach ($this->get('uvdesk.automations.workflows')->getRegisteredWorkflowActions() as $workflowAction) {
             if ($workflowAction->getId() == $entity) {
                 $options = $workflowAction->getOptions($this->container);
-
+                
                 if (!empty($options)) {
                     return new Response(json_encode($options), 200, ['Content-Type' => 'application/json']);
                 }

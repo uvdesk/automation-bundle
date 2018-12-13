@@ -58,4 +58,24 @@ class PreparedResponseXHR extends Controller
         $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
+
+    public function getPreparedResponseActionOptionsXHR($entity, Request $request)
+    {
+        foreach ($this->get('uvdesk.automations.prepared_responses')->getRegisteredPreparedResponseActions() as $preparedResponseAction) {
+            if ($preparedResponseAction->getId() == $entity) {
+                $options = $preparedResponseAction->getOptions($this->container);
+
+                if (!empty($options)) {
+                    return new Response(json_encode($options), 200, ['Content-Type' => 'application/json']);
+                }
+
+                break;
+            }
+        }
+
+        return new Response(json_encode([
+            'alertClass' => 'danger',
+            'alertMessage' => 'Warning! You are not allowed to perform this action.',
+        ]), 200, ['Content-Type' => 'application/json']);
+    }
 }

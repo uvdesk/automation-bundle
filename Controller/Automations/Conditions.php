@@ -23,12 +23,7 @@ class Conditions extends Controller
                     case 'TicketPriority':
                     case 'TicketStatus':
                         $results = $this->getDoctrine()
-                                        ->getRepository('UVDeskCoreBundle:'.ucfirst($request->attributes->get('entity')))
-                                        ->findBy(
-                                            array(
-                                                    // 'companyId' => $this->getCurrentCompany()->getId()
-                                                )
-                                        );
+                                        ->getRepository('UVDeskCoreBundle:'.ucfirst($request->attributes->get('entity')));
                         foreach ($results as $key => $result) {
                             $jsonResults[] = [
                                         'id' => $result->getId(),

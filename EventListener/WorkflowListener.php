@@ -3,10 +3,10 @@
 namespace Webkul\UVDesk\AutomationBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use Webkul\UVDesk\CoreBundle\Entity\Ticket;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Webkul\UVDesk\AutomationBundle\Entity\Workflow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Webkul\UVDesk\CoreBundle\Entity\Ticket;
 use Webkul\UVDesk\AutomationBundle\Workflow\Event as WorkflowEvent;
 use Webkul\UVDesk\AutomationBundle\Workflow\Action as WorkflowAction;
 
@@ -14,7 +14,6 @@ class WorkflowListener
 {
     private $container;
     private $entityManager;
-    public  $notePlaceholders = array();
     private $registeredWorkflowEvents = [];
     private $registeredWorkflowActions = [];
 
@@ -65,7 +64,6 @@ class WorkflowListener
                 $totalEvaluatedConditions = 0;
 
                 foreach ($this->evaluateWorkflowConditions($workflow) as $workflowCondition) {
-                   
                     $totalEvaluatedConditions++;
 
                     if (isset($workflowCondition['type']) && $this->checkCondition($workflowCondition, $event->getArgument('entity'))) {
@@ -74,15 +72,15 @@ class WorkflowListener
 
                     if (isset($workflowCondition['or'])) {
                         foreach ($workflowCondition['or'] as $orCondition) {
-                            $flag = $this->checkCondition($orCondition, $event->getArgument('entity'));
-                            if ($flag) {
+                            if ($this->checkCondition($orCondition, $event->getArgument('entity'))) {
                                 $totalConditions++;
                             }
                         }
                     }
                 }
+
                 if ($totalEvaluatedConditions == 0 || $totalConditions >= $totalEvaluatedConditions) {
-                    $this->applyWorkflowActions($workflow , $event->getArgument('entity'));
+                    $this->applyWorkflowActions($workflow, $event->getArgument('entity'));
                 }
             }
         }
@@ -122,126 +120,165 @@ class WorkflowListener
 
             foreach ($this->getRegisteredWorkflowActions() as $workflowAction) {
                 if ($workflowAction->getId() == $attributes['type']) {
-                    $workflowAction->applyAction($this->container, $entity, isset($attributes['value'])? $attributes['value']: '');
+                    $workflowAction->applyAction($this->container, $entity, isset($attributes['value']) ? $attributes['value'] : '');
                 }
             }
         }
     }
-    public function checkCondition($condition, $entity) {
-        $flag = false;
+
+    public function checkCondition($condition, $entity)
+    {
         switch ($condition['type']) {
             case 'from_mail':
-                if(isset($condition['value']) && $entity instanceof Ticket)
-                    $flag = $this->match($condition['match'],$entity->getCustomer()->getEmail(),$condition['value']);
+                if (isset($condition['value']) && $entity instanceof Ticket) {
+                    return $this->match($condition['match'], $entity->getCustomer()->getEmail(), $condition['value']);
+                }
+
                 break;
             case 'to_mail':
-                if(isset($condition['value']) && $entity instanceof Ticket && $entity->getMailboxEmail())
-                    $flag = $this->match($condition['match'],$entity->getMailboxEmail(),$condition['value']);
+                if (isset($condition['value']) && $entity instanceof Ticket && $entity->getMailboxEmail()) {
+                    return $this->match($condition['match'], $entity->getMailboxEmail(), $condition['value']);
+                }
+                
                 break;
             case 'subject':
-                if(isset($condition['value']) && ($entity instanceof Ticket || $entity instanceof Task))
-                    $flag = $this->match($condition['match'],$entity->getSubject(),$condition['value']);
+                if (isset($condition['value']) && ($entity instanceof Ticket || $entity instanceof Task)) {
+                    return $this->match($condition['match'], $entity->getSubject(), $condition['value']);
+                }
+
                 break;
             case 'description':
-                if(isset($condition['value']) && $entity instanceof Ticket) {
-                    $createThread = $this->container->get('ticket.service')->getCreateReply($entity->getId(),false);
-                    $createThread['reply'] = rtrim(strip_tags($createThread['reply']), "\n" );
-                    $flag = $this->match($condition['match'],rtrim($createThread['reply']),$condition['value']);
+                if (isset($condition['value']) && $entity instanceof Ticket) {
+                    $reply = $entity->createdThread->getReply();
+                    $reply = rtrim(strip_tags($reply), "\n" );
+                    return $this->match($condition['match'], rtrim($reply), $condition['value']);
                 }
+
                 break;
             case 'subject_or_description':
-                if(isset($condition['value']) && $entity instanceof Ticket) {
-                    $flag = $this->match($condition['match'],$entity->getSubject(),$condition['value']);
+                if (isset($condition['value']) && $entity instanceof Ticket) {
+                    $flag = $this->match($condition['match'], $entity->getSubject(), $condition['value']);
                     $createThread = $this->container->get('ticket.service')->getCreateReply($entity->getId(),false);
-                    if(!$flag) {
+                    
+                    if (!$flag) {
                         $createThread = $this->container->get('ticket.service')->getCreateReply($entity->getId(),false);
                         $createThread['reply'] = rtrim(strip_tags($createThread['reply']), "\n" );
+
                         $flag = $this->match($condition['match'],$createThread['reply'],$condition['value']);
                     }
+
+                    return $flag;
                 }
+
                 break;
             case 'TicketPriority':
-                if(isset($condition['value']) && ($entity instanceof Ticket))
-                    $flag = $this->match($condition['match'],$entity->getPriority()->getId(),$condition['value']);
+                if (isset($condition['value']) && ($entity instanceof Ticket)) {
+                    return $this->match($condition['match'], $entity->getPriority()->getId(), $condition['value']);
+                }
+
                 break;
             case 'TicketType':
-                if(isset($condition['value']) && $entity instanceof Ticket) {
+                if (isset($condition['value']) && $entity instanceof Ticket) {
                     $typeId = $entity->getType() ? $entity->getType()->getId() : 0;
-                    $flag = $this->match($condition['match'],$typeId,$condition['value']);
+                    return $this->match($condition['match'], $typeId, $condition['value']);
                 }
+
                 break;
             case 'TicketStatus':
-                if(isset($condition['value']) && $entity instanceof Ticket)
-                    $flag = $this->match($condition['match'],$entity->getStatus()->getId(),$condition['value']);
+                if (isset($condition['value']) && $entity instanceof Ticket) {
+                    return $this->match($condition['match'], $entity->getStatus()->getId(), $condition['value']);
+                }
+
                 break;
             case 'stage':
-                if(isset($condition['value']) && $entity instanceof Task)
-                    $flag = $this->match($condition['match'],$entity->getStage()->getId(),$condition['value']);
+                if (isset($condition['value']) && $entity instanceof Task) {
+                    return $this->match($condition['match'], $entity->getStage()->getId(), $condition['value']);
+                }
+
                 break;
             case 'source':
-                if(isset($condition['value']) && $entity instanceof Ticket)
-                    $flag = $this->match($condition['match'],$entity->getSource(),$condition['value']);
+                if (isset($condition['value']) && $entity instanceof Ticket) {
+                    return $this->match($condition['match'], $entity->getSource(), $condition['value']);
+                }
+
                 break;
             case 'created':
-                if(isset($condition['value']) && ($entity instanceof Ticket || $entity instanceof Task)) {
-                    $date = date_format($entity->getCreatedAt(),"d-m-Y h:ia");
-                    $flag = $this->match($condition['match'],$date,$condition['value']);
+                if (isset($condition['value']) && ($entity instanceof Ticket || $entity instanceof Task)) {
+                    $date = date_format($entity->getCreatedAt(), "d-m-Y h:ia");
+                    return $this->match($condition['match'], $date, $condition['value']);
                 }
+
                 break;
             case 'agent':
-                if(isset($condition['value']) && $entity instanceof Ticket && $entity->getAgent())
-                    $flag = $this->match($condition['match'], $entity->getAgent()->getId(), (($condition['value'] == 'actionPerformingAgent') ? ($this->container->get('user.service')->getCurrentUser() ? $this->container->get('user.service')->getCurrentUser()->getId() : 0) : $condition['value']));
+                if (isset($condition['value']) && $entity instanceof Ticket && $entity->getAgent()) {
+                    return $this->match($condition['match'], $entity->getAgent()->getId(), (($condition['value'] == 'actionPerformingAgent') ? ($this->container->get('user.service')->getCurrentUser() ? $this->container->get('user.service')->getCurrentUser()->getId() : 0) : $condition['value']));
+                }
+
                 break;
             case 'group':
-                if(isset($condition['value']) && $entity instanceof Ticket)  {
+                if (isset($condition['value']) && $entity instanceof Ticket) {
                     $groupId = $entity->getSupportGroup() ? $entity->getSupportGroup()->getId() : 0;
-                    $flag = $this->match($condition['match'],$groupId,$condition['value']);
+                    return $this->match($condition['match'], $groupId, $condition['value']);
                 }
+
                 break;
             case 'team':
-                if(isset($condition['value']) && $entity instanceof Ticket)  {
+                if (isset($condition['value']) && $entity instanceof Ticket) {
                     $subGroupId = $entity->getSupportTeam() ? $entity->getSupportTeam()->getId() : 0;
-                    $flag = $this->match($condition['match'],$subGroupId,$condition['value']);
+                    return $this->match($condition['match'], $subGroupId, $condition['value']);
                 }
+
                 break;
             case 'customer_name':
-                if(isset($condition['value']) && $entity instanceof Ticket) {
+                if (isset($condition['value']) && $entity instanceof Ticket) {
                     $lastThread = $this->container->get('ticket.service')->getTicketLastThread($entity->getId());
-                    $flag = $this->match($condition['match'],$ticket->getCustomer()->getFullName(),$condition['value']);
+                    return $this->match($condition['match'], $entity->getCustomer()->getFullName(), $condition['value']);
                 }
                 
                 break;
             case 'customer_email':
-                if(isset($condition['value']) && $entity instanceof Ticket) {
-                    $flag = $this->match($condition['match'],$entity->getCustomer()->getEmail(),$condition['value']);
+                if (isset($condition['value']) && $entity instanceof Ticket) {
+                    return $this->match($condition['match'], $entity->getCustomer()->getEmail(), $condition['value']);
                 }
+
                 break;
             case strpos($condition['type'], 'customFields[') == 0:
-                $ticketCfValues = $entity->getCustomFieldValues()->getValues();
                 $value = null;
-                foreach($ticketCfValues as $cfValue) {
+                $ticketCfValues = $entity->getCustomFieldValues()->getValues();
+                
+                foreach ($ticketCfValues as $cfValue) {
                     $mainCf = $cfValue->getTicketCustomFieldsValues();
-                    if($condition['type'] == 'customFields[' . $mainCf->getId() . ']' ) {
-                        if( in_array($mainCf->getFieldType(), ['select', 'radio', 'checkbox']) ) {
+                    
+                    if ($condition['type'] == 'customFields[' . $mainCf->getId() . ']' ) {
+                        if (in_array($mainCf->getFieldType(), ['select', 'radio', 'checkbox'])) {
                            $value = json_decode($cfValue->getValue(), true);
                         } else {
-                            $value = trim($cfValue->getValue(), '"');
+                           $value = trim($cfValue->getValue(), '"');
                         }
-                       break;
+                        
+                        break;
                     }
                 }
-                if(isset($condition['value']) && $entity instanceof Ticket) {
-                    $flag = $this->match($condition['match'], !empty($value) ? $value : '', $condition['value']);
+
+                if (isset($condition['value']) && $entity instanceof Ticket) {
+                    return $this->match($condition['match'], !empty($value) ? $value : '', $condition['value']);
                 }
+
+                break;
+            default:
                 break;
         }
-        return $flag;
+
+        return false;
     }
-    public function match($condition,$haystack,$needle) {
-        //remove tags
-        if('string' == gettype($haystack)) {
+
+    public function match($condition, $haystack, $needle)
+    {
+        // Filter tags
+        if ('string' == gettype($haystack)) {
             $haystack = strip_tags($haystack);
         }
+
         switch ($condition) {
             case 'is':
                 return is_array($haystack) ? in_array($needle, $haystack) : $haystack == $needle;
@@ -256,58 +293,73 @@ class WorkflowListener
             case 'endWith':
                 return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && stripos($haystack, $needle, $temp) !== FALSE);
             case 'before':
-                $createdTimeStamp = date('Y-m-d',strtotime($haystack));
-                $conditionTimeStamp = date('Y-m-d',strtotime($needle." 23:59:59"));
+                $createdTimeStamp = date('Y-m-d', strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d', strtotime($needle . " 23:59:59"));
+
                 return $createdTimeStamp < $conditionTimeStamp ? true : false;
             case 'beforeOn':
-                $createdTimeStamp = date('Y-m-d',strtotime($haystack));
-                $conditionTimeStamp = date('Y-m-d',strtotime($needle." 23:59:59"));
+                $createdTimeStamp = date('Y-m-d', strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d', strtotime($needle . " 23:59:59"));
+
                 return ($createdTimeStamp < $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp) ? true : false;
             case 'after':
-                $createdTimeStamp = date('Y-m-d',strtotime($haystack));
-                $conditionTimeStamp = date('Y-m-d',strtotime($needle." 23:59:59"));
+                $createdTimeStamp = date('Y-m-d', strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d', strtotime($needle . " 23:59:59"));
+
                 return $createdTimeStamp > $conditionTimeStamp ? true : false;
             case 'afterOn':
-                $createdTimeStamp = date('Y-m-d',strtotime($haystack));
-                $conditionTimeStamp = date('Y-m-d',strtotime($needle." 23:59:59"));
+                $createdTimeStamp = date('Y-m-d', strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d', strtotime($needle . " 23:59:59"));
+                
                 return $createdTimeStamp > $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp ? true : false;
             case 'beforeDateTime':
-                $createdTimeStamp = date('Y-m-d h:i:s',strtotime($haystack));
-                $conditionTimeStamp = date('Y-m-d h:i:s',strtotime($needle));
+                $createdTimeStamp = date('Y-m-d h:i:s', strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d h:i:s', strtotime($needle));
+
                 return $createdTimeStamp < $conditionTimeStamp ? true : false;
             case 'beforeDateTimeOn':
-                $createdTimeStamp = date('Y-m-d h:i:s',strtotime($haystack));
-                $conditionTimeStamp = date('Y-m-d h:i:s',strtotime($needle));
+                $createdTimeStamp = date('Y-m-d h:i:s', strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d h:i:s', strtotime($needle));
+
                 return ($createdTimeStamp < $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp) ? true : false;
             case 'afterDateTime':
-                $createdTimeStamp = date('Y-m-d h:i:s',strtotime($haystack));
-                $conditionTimeStamp = date('Y-m-d h:i:s',strtotime($needle));
+                $createdTimeStamp = date('Y-m-d h:i:s', strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d h:i:s', strtotime($needle));
+
                 return $createdTimeStamp > $conditionTimeStamp ? true : false;
             case 'afterDateTimeOn':
-                $createdTimeStamp = date('Y-m-d h:i:s',strtotime($haystack));
-                $conditionTimeStamp = date('Y-m-d h:i:s',strtotime($needle));
+                $createdTimeStamp = date('Y-m-d h:i:s', strtotime($haystack));
+                $conditionTimeStamp = date('Y-m-d h:i:s', strtotime($needle));
+
                 return $createdTimeStamp > $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp ? true : false;
             case 'beforeTime':
-                $createdTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$haystack));
-                $conditionTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$needle));
+                $createdTimeStamp = date('Y-m-d H:i A', strtotime('2017-01-01' . $haystack));
+                $conditionTimeStamp = date('Y-m-d H:i A', strtotime('2017-01-01' . $needle));
+
                 return $createdTimeStamp < $conditionTimeStamp ? true : false;
             case 'beforeTimeOn':
-                $createdTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$haystack));
-                $conditionTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$needle));
+                $createdTimeStamp = date('Y-m-d H:i A', strtotime('2017-01-01' . $haystack));
+                $conditionTimeStamp = date('Y-m-d H:i A', strtotime('2017-01-01' . $needle));
+
                 return ($createdTimeStamp < $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp) ? true : false;
             case 'afterTime':
-                $createdTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$haystack));
-                $conditionTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$needle));
+                $createdTimeStamp = date('Y-m-d H:i A', strtotime('2017-01-01' . $haystack));
+                $conditionTimeStamp = date('Y-m-d H:i A', strtotime('2017-01-01' . $needle));
+
                 return $createdTimeStamp > $conditionTimeStamp ? true : false;
             case 'afterTimeOn':
-                $createdTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$haystack));
-                $conditionTimeStamp = date('Y-m-d H:i A',strtotime('2017-01-01'.$needle));
+                $createdTimeStamp = date('Y-m-d H:i A', strtotime('2017-01-01' . $haystack));
+                $conditionTimeStamp = date('Y-m-d H:i A', strtotime('2017-01-01' . $needle));
+
                 return $createdTimeStamp > $conditionTimeStamp || $createdTimeStamp == $conditionTimeStamp ? true : false;
             case 'greaterThan':
                 return !is_array($haystack) && $needle > $haystack;
             case 'lessThan':
                 return !is_array($haystack) && $needle < $haystack;
+            default:
+                break;
         }
-    }
 
+        return false;
+    }
 }

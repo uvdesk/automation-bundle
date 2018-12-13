@@ -23,18 +23,16 @@ class Actions extends Controller
         foreach ($this->container->get('workflow.listener.alias')->getRegisteredWorkflowActions() as $workflowAction) {
             if ($workflowAction->getId() == $workflowActionId) {
                 $options = $workflowAction->getOptions($this->container);
-
+                dump($options); die;
                 if (!empty($options)) {
                     return new Response(json_encode($options), 200, ['Content-Type' => 'application/json']);
                 }
-
                 break;
             }
         }
-
         return new Response(json_encode([
-            'alertClass' => 'danger',
-            'alertMessage' => 'Warning! You are not allowed to perform this action.',
+            'alertClass'    => 'danger',
+            'alertMessage'  => 'Warning! You are not allowed to perform this action.',
         ]), 200, ['Content-Type' => 'application/json']);
 
         // switch ($request->attributes->get('entity')) {

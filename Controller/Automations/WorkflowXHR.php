@@ -85,5 +85,101 @@ class WorkflowXHR extends Controller
         $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
+    
+    public function getWorkflowConditionOptionsXHR($entity, Request $request)
+    {
+        $error = false;
+        $json = $results = array();
+        $supportedConditions = ['TicketPriority', 'TicketType', 'TicketStatus', 'source', 'agent', 'group','team', 'agent_name', 'agent_email', 'stage'];
 
+        if (!$request->isXmlHttpRequest()) {
+            throw new Exception('', 404);
+        } else {
+            if ($request->getMethod() != 'GET' || !in_array($entity, $supportedConditions)) {
+                throw new Exception('', 404);
+            }
+        }
+
+        switch ($entity) {
+            case 'team':
+                $json = json_encode($this->get('user.service')->getSupportTeams());
+                break;
+            case 'group':
+                $results = $this->get('user.service')->getSupportGroups();
+                break;
+            case 'stage':
+                $results = $this->get('task.service')->getStages();
+                break;
+            case 'TicketType':
+                $results = $this->get('ticket.service')->getTypes();
+                break;
+            case 'agent':
+            case 'agent_name':
+                $json = json_encode(array_map(function($item) {
+                    return [
+                        'id' => $result['id'],
+                        'name' => $result['name'],
+                    ];
+                }, ['id' => 'actionPerformingAgent', 'name' => 'Action Performing Agent'], $this->get('user.service')->getAgentPartialDataCollection()));
+
+                break;
+            case 'agent_email':
+                $json = json_encode(array_map(function($item) {
+                    return [
+                        'id' => $result['id'],
+                        'name' => $result['email'],
+                    ];
+                }, $this->get('user.service')->getAgentsPartialDetails()));
+
+                break;
+            case 'source':
+                $results = array_map(function ($item) {
+                    return [
+                        'id' => $key,
+                        'name' => $source,
+                    ];
+                }, $this->get('ticket.service')->getAllSources());
+
+                break;
+            case 'TicketStatus':
+            case 'TicketPriority':
+                $json = json_encode(array_map(function($item) {
+                    return [
+                        'id' => $item->getId(),
+                        'name' => $item->getCode(),
+                    ];
+                }, $this->getDoctrine()->getRepository('UVDeskCoreBundle:' . ucfirst($entity))->findAll()));
+
+                break;
+            default:
+                $json = [];
+                break;
+        }
+
+        // if (!empty($results)) {
+        //     $ignoredArray = ['__initializer__', '__cloner__', '__isInitialized__', 'description', 'color', 'company', 'createdAt', 'users', 'isActive'];
+        //     $json = $this->getSerializeObj($ignoredArray)->serialize($results, 'json');
+        // }
+
+        return new Response(is_array($json) ? json_encode($json) : $json, 200, ['Content-Type' => 'application/json']);
+    }
+
+    public function getWorkflowActionOptionsXHR($entity, Request $request)
+    {
+        foreach ($this->get('uvdesk.automations.workflows')->getRegisteredWorkflowActions() as $workflowAction) {
+            if ($workflowAction->getId() == $entity) {
+                $options = $workflowAction->getOptions($this->container);
+                if (!empty($options)) {
+                    return new Response(json_encode($options), 200, ['Content-Type' => 'application/json']);
+                }
+
+                break;
+            }
+        }
+
+        return new Response(json_encode([
+            'alertClass' => 'danger',
+            'alertMessage' => 'Warning! You are not allowed to perform this action.',
+        ]), 200, ['Content-Type' => 'application/json']);
+    }
 }

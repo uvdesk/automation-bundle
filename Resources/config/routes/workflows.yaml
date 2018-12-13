@@ -30,6 +30,6 @@ helpdesk_member_workflow_condition_options_xhr:
     defaults:   { entity: default }
 
 helpdesk_member_workflow_action_options_xhr:
-    path:     /workflow/xhr/action/options/{entity}
+    path:     /workflow/xhr/action/options/{entity}/{event}
     controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\WorkflowXHR::getWorkflowActionOptionsXHR
-    defaults:   { entity: default }
+    defaults:   { entity: default , event: null }

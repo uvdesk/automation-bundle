@@ -25,6 +25,6 @@ prepare_response_editaction:
     defaults: { panelId: 'productivity', id: 0 }
 
 helpdesk_member_prepared_response_action_options_xhr:
-    path:     /prepared-responses/xhr/action/options/{entity}
+    path:     /prepared-responses/xhr/action/options/{entity}/{event}
     controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponseXHR::getPreparedResponseActionOptionsXHR
-    defaults:   { entity: default }
+    defaults:   { entity: default, event: null }

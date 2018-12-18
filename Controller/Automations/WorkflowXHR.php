@@ -105,13 +105,13 @@ class WorkflowXHR extends Controller
                 $json = json_encode($this->get('user.service')->getSupportTeams());
                 break;
             case 'group':
-                $results = $this->get('user.service')->getSupportGroups();
+                $json = $this->get('user.service')->getSupportGroups();
                 break;
             case 'stage':
-                $results = $this->get('task.service')->getStages();
+                $json = $this->get('task.service')->getStages();
                 break;
             case 'TicketType':
-                $results = $this->get('ticket.service')->getTypes();
+                $json = $this->get('ticket.service')->getTypes();
                 break;
             case 'agent':
             case 'agent_name':
@@ -133,13 +133,16 @@ class WorkflowXHR extends Controller
 
                 break;
             case 'source':
-                $results = array_map(function ($item) {
-                    return [
-                        'id' => $key,
-                        'name' => $source,
-                    ];
-                }, $this->get('ticket.service')->getAllSources());
-
+                $allSources = $this->container->get('ticket.service')->getAllSources();
+                $results = [];
+                foreach($allSources as $key => $source) {
+                        $results[] = [
+                                    'id' => $key,
+                                    'name' => $source,
+                        ];
+                };
+                $json = json_encode($results);
+                $results = [];
                 break;
             case 'TicketStatus':
             case 'TicketPriority':
@@ -169,6 +172,7 @@ class WorkflowXHR extends Controller
         foreach ($this->get('uvdesk.automations.workflows')->getRegisteredWorkflowActions() as $workflowAction) {
             if ($workflowAction->getId() == $entity) {
                 $options = $workflowAction->getOptions($this->container);
+                
                 if (!empty($options)) {
                     return new Response(json_encode($options), 200, ['Content-Type' => 'application/json']);
                 }

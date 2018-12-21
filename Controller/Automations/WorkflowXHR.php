@@ -115,12 +115,16 @@ class WorkflowXHR extends Controller
                 break;
             case 'agent':
             case 'agent_name':
+                $defaultAgent = ['id' => 'actionPerformingAgent', 'name' => 'Action Performing Agent'];
+                $agentList = $this->get('user.service')->getAgentPartialDataCollection();
+                array_push($agentList, $defaultAgent);
+
                 $json = json_encode(array_map(function($item) {
                     return [
-                        'id' => $result['id'],
-                        'name' => $result['name'],
+                        'id' => $item['id'],
+                        'name' => $item['name'],
                     ];
-                }, ['id' => 'actionPerformingAgent', 'name' => 'Action Performing Agent'], $this->get('user.service')->getAgentPartialDataCollection()));
+                }, $agentList));
 
                 break;
             case 'agent_email':

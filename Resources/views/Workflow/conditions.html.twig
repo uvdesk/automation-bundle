@@ -72,11 +72,11 @@
 	}
 
 	sB.conditionRow = 0;
-	sB.JsonConditions = JSON.parse("{{ uvdesk_automations.getTicketConditions() | json_encode | e('js') }}");
-	sB.MatchConditions = JSON.parse("{{ uvdesk_automations.getTicketMatchConditions() | json_encode | e('js') }}");
+	sB.JsonConditions = JSON.parse("{{ uvdesk_automations.getWorkflowConditions() | json_encode | e('js') }}");
+	sB.MatchConditions = JSON.parse("{{ uvdesk_automations.getWorkflowMatchConditions() | json_encode | e('js') }}");
 
 	sB.Collection = Backbone.Collection.extend({
-	    baseUrl: "{{ path('webkul_conditions_actions_xhr') }}",
+	    baseUrl: "{{ path('helpdesk_member_workflow_condition_options_xhr') }}",
 		fetchResult: function(dataMatch) {
 			this.url = this.baseUrl + '/' + dataMatch;
 	        return this.fetch();

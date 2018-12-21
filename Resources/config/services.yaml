@@ -4,16 +4,25 @@ services:
         arguments: ['@service_container', '@doctrine.orm.entity_manager']
         tags: ['doctrine.fixture.orm']
     
-    uvdesk.automations:
-        public: true
-        class: Webkul\UVDesk\AutomationBundle\Services\AutomationService
-        arguments: ['@service_container', '@request_stack', '@doctrine.orm.entity_manager']
-    
     Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener:
         arguments: ['@service_container', '@doctrine.orm.entity_manager']
         tags:
             - { name: kernel.event_listener, event: uvdesk.automation.workflow.execute, method: executeWorkflow }
     
-    workflow.listener.alias:
+    Webkul\UVDesk\AutomationBundle\EventListener\PreparedResponseListener:
+        arguments: ['@service_container', '@doctrine.orm.entity_manager']
+        tags:
+            - { name: kernel.event_listener, event: uvdesk.automation.prepared_response.execute, method: executePreparedResponse }
+    
+    uvdesk.automations:
+        public: true
+        class: Webkul\UVDesk\AutomationBundle\Services\AutomationService
+        arguments: ['@service_container', '@request_stack', '@doctrine.orm.entity_manager']
+    
+    uvdesk.automations.workflows:
         alias: Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener
+        public: true
+    
+    uvdesk.automations.prepared_responses:
+        alias: Webkul\UVDesk\AutomationBundle\EventListener\PreparedResponseListener
         public: true

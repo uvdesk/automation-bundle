@@ -61,7 +61,7 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'actions' => 'a:1:{i:1;a:2:{s:4:"type";s:29:"uvdesk.customer.mail_customer";s:5:"value";s:1:"8";}}',
             'status' => '1',
             'sort_order' => '5',
-            'events' => ['uvdesk.ticket.created']
+            'events' => ['uvdesk.ticket.agent_reply']
         ],
     ];
 

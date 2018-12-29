@@ -20,5 +20,6 @@ class UVDeskAutomationBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new UVDeskAutomationCompilers\WorkflowPass());
+        $container->addCompilerPass(new UVDeskAutomationCompilers\PreparedResponsePass());
     }
 }

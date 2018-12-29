@@ -1,0 +1,30 @@
+# Prepare Responses Resources
+prepare_response_action:
+    path:     /prepared-responses
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponse::prepareResponseList
+    defaults: { panelId: 'productivity'}
+
+prepare_response_delete:
+    path:     /prepared-responses/delete/{id}
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponseXHR::prepareResponseDeleteXhr
+    defaults: { panelId: 'productivity', id: 0}
+
+prepare_response_list_xhr:
+    path:     /prepared-responses/ajax
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponseXHR::prepareResponseListXhr
+    defaults: { panelId: 'productivity'}
+
+prepare_response_addaction:
+    path:     /prepared-responses/add
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponse::createPrepareResponse
+    defaults: { panelId: 'productivity'}
+
+prepare_response_editaction:
+    path:     /prepared-responses/edit/{id}
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponse::editPrepareResponse
+    defaults: { panelId: 'productivity', id: 0 }
+
+helpdesk_member_prepared_response_action_options_xhr:
+    path:     /prepared-responses/xhr/action/options/{entity}/{event}
+    controller: Webkul\UVDesk\AutomationBundle\Controller\Automations\PreparedResponseXHR::getPreparedResponseActionOptionsXHR
+    defaults:   { entity: default, event: null }

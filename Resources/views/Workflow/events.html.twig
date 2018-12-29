@@ -1,4 +1,4 @@
-{% set workflowAccess = user_service.checkPermission('workflows_addaction') %}
+{% set workflowAccess = user_service.isAccessAuthorized('workflows_addaction') %}
 
 <script type="text/template" id="event-add">
 	<select class="uv-select uv-select-grouped select-event wfEvents" name="events[<%- keyNo %>][event]" <%- typeof(event) != 'undefined' && event ? "disabled=disabled" : '' %>  style="width: 300px;">

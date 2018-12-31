@@ -81,7 +81,7 @@
                         </label>
                     </div>
                 </div>
-                {% if user_service.checkPermission('ROLE_ADMIN') %}
+                {% if user_service.isAccessAuthorized('ROLE_ADMIN') %}
                     <div class="uv-hr"></div>
                 
                     <!-- Field -->

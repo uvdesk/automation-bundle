@@ -23,7 +23,7 @@ class PreparedResponse extends Controller
 
     public function prepareResponseList(Request $request)
     {
-        if (!$this->get('user.service')->checkPermission('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
+        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -32,7 +32,7 @@ class PreparedResponse extends Controller
 
     public function createPrepareResponse(Request $request)
     {
-        if (!$this->get('user.service')->checkPermission('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
+        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -89,7 +89,7 @@ class PreparedResponse extends Controller
                     }
                 }
 
-                if($this->get('user.service')->checkPermission('ROLE_ADMIN')) {
+                if ($this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
                     /* groups */ 
                     $groups = explode(',', $request->request->get('tempGroups'));
                     $previousGroupIds = [];
@@ -144,7 +144,7 @@ class PreparedResponse extends Controller
                     $newWorkflow->setUser($userData);
                 }
 
-                if($newWorkflow->getUser()->getId() == $userData->getId() || $this->get('user.service')->checkPermission('ROLE_ADMIN')) {
+                if($newWorkflow->getUser()->getId() == $userData->getId() || $this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
                     $newWorkflow->setActions($workflowActionsArray);
                 }
 
@@ -182,7 +182,7 @@ class PreparedResponse extends Controller
 
     public function editPrepareResponse(Request $request)
     {
-        if (!$this->get('user.service')->checkPermission('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
+        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -259,7 +259,7 @@ class PreparedResponse extends Controller
                     }
                 }
                 
-                if($this->get('user.service')->checkPermission('ROLE_ADMIN')) {
+                if ($this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
                     /* groups */ 
                     $groups = explode(',', $request->request->get('tempGroups'));
                     $previousGroupIds = [];
@@ -314,7 +314,7 @@ class PreparedResponse extends Controller
                     $newWorkflow->setUser($userData);
                 }
 
-                if($newWorkflow->getUser()->getId() == $userData->getId() || $this->get('user.service')->checkPermission('ROLE_ADMIN')) {
+                if ($newWorkflow->getUser()->getId() == $userData->getId() || $this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
                     $newWorkflow->setActions($workflowActionsArray);
                 }
 

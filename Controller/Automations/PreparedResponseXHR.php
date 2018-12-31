@@ -23,7 +23,7 @@ class PreparedResponseXHR extends Controller
 
     public function prepareResponseListXhr(Request $request)
     {
-        if (!$this->get('user.service')->checkPermission('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {          
+        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {          
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -37,7 +37,7 @@ class PreparedResponseXHR extends Controller
 
     public function prepareResponseDeleteXhr(Request $request)
     {
-        if (!$this->get('user.service')->checkPermission('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {          
+        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {          
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 

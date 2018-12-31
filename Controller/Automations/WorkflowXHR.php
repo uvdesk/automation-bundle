@@ -10,7 +10,7 @@ class WorkflowXHR extends Controller
 {
     public function workflowsListXhr(Request $request)
     {
-        if (!$this->get('user.service')->checkPermission('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
+        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -25,7 +25,7 @@ class WorkflowXHR extends Controller
 
     public function WorkflowsxhrAction(Request $request)
     {
-        if (!$this->get('user.service')->checkPermission('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
+        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
         

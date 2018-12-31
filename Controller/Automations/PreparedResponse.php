@@ -89,7 +89,7 @@ class PreparedResponse extends Controller
                     }
                 }
 
-                if($this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
+                if ($this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
                     /* groups */ 
                     $groups = explode(',', $request->request->get('tempGroups'));
                     $previousGroupIds = [];
@@ -259,7 +259,7 @@ class PreparedResponse extends Controller
                     }
                 }
                 
-                if($this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
+                if ($this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
                     /* groups */ 
                     $groups = explode(',', $request->request->get('tempGroups'));
                     $previousGroupIds = [];
@@ -314,7 +314,7 @@ class PreparedResponse extends Controller
                     $newWorkflow->setUser($userData);
                 }
 
-                if($newWorkflow->getUser()->getId() == $userData->getId() || $this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
+                if ($newWorkflow->getUser()->getId() == $userData->getId() || $this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
                     $newWorkflow->setActions($workflowActionsArray);
                 }
 

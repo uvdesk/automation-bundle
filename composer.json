@@ -19,10 +19,7 @@
         "psr-4": { "Webkul\\UVDesk\\AutomationBundle\\": "" }
     },
     "extra": {
-        "uvdesk-package-extension": "Webkul\\UVDesk\\AutomationBundle\\Package\\Composer",
-        "branch-alias": {
-            "dev-master": "0.1.x-dev"
-        }
+        "uvdesk-package-extension": "Webkul\\UVDesk\\AutomationBundle\\Package\\Composer"
     },
     "minimum-stability": "dev"
 }

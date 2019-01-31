@@ -57,6 +57,7 @@ class WorkflowListener
     public function executeWorkflow(GenericEvent $event)
     {   
         $workflowCollection = $this->entityManager->getRepository('UVDeskAutomationBundle:Workflow')->getEventWorkflows($event->getSubject());
+        
         if (!empty($workflowCollection)) {
             foreach ($workflowCollection as $workflow) {
                 $totalConditions = 0;

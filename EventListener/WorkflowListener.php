@@ -55,9 +55,9 @@ class WorkflowListener
     }
 
     public function executeWorkflow(GenericEvent $event)
-    {
+    {   
         $workflowCollection = $this->entityManager->getRepository('UVDeskAutomationBundle:Workflow')->getEventWorkflows($event->getSubject());
-
+        
         if (!empty($workflowCollection)) {
             foreach ($workflowCollection as $workflow) {
                 $totalConditions = 0;
@@ -80,7 +80,7 @@ class WorkflowListener
                 }
 
                 if ($totalEvaluatedConditions == 0 || $totalConditions >= $totalEvaluatedConditions) {
-                    $this->applyWorkflowActions($workflow, $event->getArgument('entity'));
+                    $this->applyWorkflowActions($workflow, $event->getArgument('entity'), $event->hasArgument('thread') ? $event->getArgument('thread') : null);
                 }
             }
         }
@@ -111,7 +111,7 @@ class WorkflowListener
         return $workflowConditions;
     }
 
-    private function applyWorkflowActions(Workflow $workflow, $entity)
+    private function applyWorkflowActions(Workflow $workflow, $entity, $thread = null)
     {
         foreach ($workflow->getActions() as $attributes) {
             if (empty($attributes['type'])) {
@@ -120,7 +120,7 @@ class WorkflowListener
 
             foreach ($this->getRegisteredWorkflowActions() as $workflowAction) {
                 if ($workflowAction->getId() == $attributes['type']) {
-                    $workflowAction->applyAction($this->container, $entity, isset($attributes['value']) ? $attributes['value'] : '');
+                    $workflowAction->applyAction($this->container, $entity, isset($attributes['value']) ? $attributes['value'] : '', $thread);
                 }
             }
         }

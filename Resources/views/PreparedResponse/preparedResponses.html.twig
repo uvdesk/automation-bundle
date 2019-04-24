@@ -119,7 +119,7 @@
 			<td data-value="{{ 'User'|trans }}">
 				<% if(user) { %>
 					<% if(user.smallThumbnail != null) { %>
-						<img src="<%- user.smallThumbnail %>" alt=""/>
+						<img src="{{ app.request.scheme ~'://' ~ app.request.httpHost ~ asset('') }}<%- user.smallThumbnail %>" alt=""/>
 					<% } else { %>
 						{# <img src="{{ agentAsset }}" alt=""/> #}
 					<% } %>

@@ -49,7 +49,7 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'name' => 'Ticket Created',
             'description' => 'Automate actions when ticket is created.',
             'conditions' => 'N;',
-            'actions' => 'a:3:{i:0;a:2:{s:4:"type";s:27:"uvdesk.ticket.mail_customer";s:5:"value";s:1:"7";}i:1;a:2:{s:4:"type";s:26:"uvdesk.ticket.assign_agent";s:5:"value";s:1:"1";}i:2;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:1:{i:0;s:13:"assignedAgent";}s:5:"value";s:1:"2";}}}',
+            'actions' => 'a:3:{i:0;a:2:{s:4:"type";s:27:"uvdesk.ticket.mail_customer";s:5:"value";s:1:"7";}i:1;a:2:{s:4:"type";s:26:"uvdesk.ticket.assign_agent";s:5:"value";s:18:"responsePerforming";}i:2;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:1:{i:0;s:13:"assignedAgent";}s:5:"value";s:1:"2";}}}',
             'status' => '1',
             'sort_order' => '5',
             'events' => ['uvdesk.ticket.created']

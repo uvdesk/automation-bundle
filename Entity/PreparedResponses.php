@@ -6,46 +6,60 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * PreparedResponses
+ * @ORM\HasLifecycleCallbacks()
+ * @ORM\Entity(repositoryClass="Webkul\UVDesk\AutomationBundle\Repository\PreparedResponsesRepository")
+ * @ORM\Table(name="uv_prepared_responses")
  */
+
 class PreparedResponses
 {
     /**
      * @var integer
+     * @ORM\Id()
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue
      */
     private $id;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255)
      */
     private $name;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $description;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=true, options={"default": "public"})
      */
     private $type;
 
     /**
      * @var array
+     * @ORM\Column(type="array")
      */
     private $actions;
 
     /**
      * @var boolean
+     * @ORM\Column(type="boolean", nullable=true, options={"default": true})
      */
     private $status;
 
     /**
      * @var \DateTime
+     * @ORM\Column(type="datetime")
      */
     private $dateAdded;
 
     /**
      * @var \DateTime
+     * @ORM\Column(type="datetime")
      */
     private $dateUpdated;
 
@@ -238,6 +252,8 @@ class PreparedResponses
     }
     /**
      * @var \Webkul\UserBundle\Entity\UserData
+     * @ORM\ManyToOne(targetEntity="Webkul\UVDesk\CoreBundle\Entity\UserInstance")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $user;
 
@@ -269,11 +285,21 @@ class PreparedResponses
      */
     /**
      * @var \Doctrine\Common\Collections\Collection
+     * @ORM\ManyToMany(targetEntity="Webkul\UVDesk\CoreBundle\Entity\SupportGroup")
+     * @ORM\JoinTable(name="uv_prepared_response_support_groups",
+     *      joinColumns={@ORM\JoinColumn(name="savedReply_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
+     *  )
      */
     private $groups;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
+     * @ORM\ManyToMany(targetEntity="Webkul\UVDesk\CoreBundle\Entity\SupportTeam")
+     * @ORM\JoinTable(name="uv_prepared_response_support_teams",
+     *      joinColumns={@ORM\JoinColumn(name="savedReply_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="subgroup_id", referencedColumnName="id", onDelete="CASCADE")}
+     *  )
      */
     private $teams;
 

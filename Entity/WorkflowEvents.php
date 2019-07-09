@@ -2,28 +2,40 @@
 
 namespace Webkul\UVDesk\AutomationBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
  * WorkflowEvents
+ * @ORM\HasLifecycleCallbacks
+ * @ORM\Entity(repositoryClass="Webkul\UVDesk\AutpmationBundle\Repository\WorkflowEventsRepository")
+ * @ORM\Table(name="uv_workflow_events")
  */
 class WorkflowEvents
 {
     /**
      * @var integer
+     * @ORM\Id()
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue
      */
     private $id;
 
     /**
      * @var integer
+     * @ORM\Column(type="integer")
      */
     private $eventId;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=191)
      */
     private $event;
 
     /**
      * @var \Webkul\UVDesk\AutomationBundle\Entity\Workflow
+     * @ORM\ManyToOne(targetEntity="Webkul\UVDesk\AutomationBundle\Entity\Workflow", inversedBy="WorkflowEvents")
+     * @ORM\JoinColumn(name="workflow_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $workflow;
 

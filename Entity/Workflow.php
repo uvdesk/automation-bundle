@@ -2,63 +2,83 @@
 
 namespace Webkul\UVDesk\AutomationBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
+
 /**
  * Workflow
+ * @ORM\HasLifecycleCallbacks
+ * @ORM\Entity(repositoryClass="Webkul\UVDesk\AutomationBundle\Repository\WorkflowRepository")
+ * @ORM\Table(name="uv_workflow")
  */
 class Workflow
 {
     /**
      * @var integer
+     * @ORM\Id;
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue
      */
     private $id;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=191) 
      */
     private $name;
 
     /**
      * @var string
+     * @ORM\Column(type="text", nullable=true)
      */
     private $description;
 
     /**
      * @var array
+     * @ORM\Column(type="array")
      */
     private $conditions;
 
     /**
      * @var array
+     * @ORM\Column(type="array")
      */
     private $actions;
 
     /**
      * @var integer
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $sortOrder;
 
     /**
      * @var boolean
+     * @ORM\Column(type="boolean", options={"default": true})
      */
     private $isPredefind = true;
 
     /**
      * @var boolean
+     * @ORM\Column(type="boolean", options={"default": true})
      */
     private $status = true;
 
     /**
      * @var \DateTime
+     * @ORM\Column(type="datetime")
      */
     private $dateAdded;
 
     /**
      * @var \DateTime
+     * @ORM\Column(type="datetime")
      */
     private $dateUpdated;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
+     * @ORM\OneToMany(targetEntity="Webkul\UVDesk\AutomationBundle\Entity\WorkflowEvents", mappedBy="workflow")
+     * 
      */
     private $workflowEvents;
 

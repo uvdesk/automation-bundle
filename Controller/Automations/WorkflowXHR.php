@@ -155,7 +155,7 @@ class WorkflowXHR extends Controller
                         'id' => $item->getId(),
                         'name' => $item->getCode(),
                     ];
-                }, $this->getDoctrine()->getRepository('UVDeskCoreBundle:' . ucfirst($entity))->findAll()));
+                }, $this->getDoctrine()->getRepository('UVDeskCoreFrameworkBundle:' . ucfirst($entity))->findAll()));
 
                 break;
             default:

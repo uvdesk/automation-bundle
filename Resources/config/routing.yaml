@@ -1,6 +1,0 @@
-# Workflow resources
-helpdesk_automation_workflow_resources:
-    resource: "@UVDeskAutomationBundle/Resources/config/routes/workflows.yaml"
-
-helpdesk_automation_prepared_response_resources:
-    resource: "@UVDeskAutomationBundle/Resources/config/routes/prepared_responses.yaml"

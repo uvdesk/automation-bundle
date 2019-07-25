@@ -252,7 +252,7 @@ class PreparedResponses
     }
     /**
      * @var \Webkul\UserBundle\Entity\UserData
-     * @ORM\ManyToOne(targetEntity="Webkul\UVDesk\CoreBundle\Entity\UserInstance")
+     * @ORM\ManyToOne(targetEntity="Webkul\UVDesk\CoreFrameworkBundle\Entity\UserInstance")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $user;
@@ -261,10 +261,10 @@ class PreparedResponses
     /**
      * Set user
      *
-     * @param \Webkul\UVDesk\CoreBundle\Entity\UserInstance $user
+     * @param \Webkul\UVDesk\CoreFrameworkBundle\Entity\UserInstance $user
      * @return PreparedResponses
      */
-    public function setUser(\Webkul\UVDesk\CoreBundle\Entity\UserInstance $user = null)
+    public function setUser(\Webkul\UVDesk\CoreFrameworkBundle\Entity\UserInstance $user = null)
     {
         $this->user = $user;
 
@@ -274,7 +274,7 @@ class PreparedResponses
     /**
      * Get user
      *
-     * @return \Webkul\UVDesk\CoreBundle\Entity\UserInstance 
+     * @return \Webkul\UVDesk\CoreFrameworkBundle\Entity\UserInstance 
      */
     public function getUser()
     {
@@ -285,7 +285,7 @@ class PreparedResponses
      */
     /**
      * @var \Doctrine\Common\Collections\Collection
-     * @ORM\ManyToMany(targetEntity="Webkul\UVDesk\CoreBundle\Entity\SupportGroup")
+     * @ORM\ManyToMany(targetEntity="Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportGroup")
      * @ORM\JoinTable(name="uv_prepared_response_support_groups",
      *      joinColumns={@ORM\JoinColumn(name="savedReply_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
@@ -295,7 +295,7 @@ class PreparedResponses
 
     /**
      * @var \Doctrine\Common\Collections\Collection
-     * @ORM\ManyToMany(targetEntity="Webkul\UVDesk\CoreBundle\Entity\SupportTeam")
+     * @ORM\ManyToMany(targetEntity="Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportTeam")
      * @ORM\JoinTable(name="uv_prepared_response_support_teams",
      *      joinColumns={@ORM\JoinColumn(name="savedReply_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="subgroup_id", referencedColumnName="id", onDelete="CASCADE")}
@@ -315,10 +315,10 @@ class PreparedResponses
     /**
      * Add groups
      *
-     * @param \Webkul\UVDesk\CoreBundle\Entity\SupportGroup $groups
+     * @param \Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportGroup $groups
      * @return PreparedResponses
      */
-    public function addGroup(\Webkul\UVDesk\CoreBundle\Entity\SupportGroup $groups)
+    public function addGroup(\Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportGroup $groups)
     {
         $this->groups[] = $groups;
 
@@ -328,9 +328,9 @@ class PreparedResponses
     /**
      * Remove groups
      *
-     * @param \Webkul\UVDesk\CoreBundle\Entity\SupportGroup $groups
+     * @param \Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportGroup $groups
      */
-    public function removeGroup(\Webkul\UVDesk\CoreBundle\Entity\SupportGroup $groups)
+    public function removeGroup(\Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportGroup $groups)
     {
         $this->groups->removeElement($groups);
     }
@@ -348,10 +348,10 @@ class PreparedResponses
     /**
      * Add teams
      *
-     * @param \Webkul\UVDesk\CoreBundle\Entity\SupportTeam $teams
+     * @param \Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportTeam $teams
      * @return PreparedResponses
      */
-    public function addTeam(\Webkul\UVDesk\CoreBundle\Entity\SupportTeam $teams)
+    public function addTeam(\Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportTeam $teams)
     {
         $this->teams[] = $teams;
 
@@ -361,9 +361,9 @@ class PreparedResponses
     /**
      * Remove teams
      *
-     * @param \Webkul\UVDesk\CoreBundle\Entity\SupportTeam $teams
+     * @param \Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportTeam $teams
      */
-    public function removeTeam(\Webkul\UVDesk\CoreBundle\Entity\SupportTeam $teams)
+    public function removeTeam(\Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportTeam $teams)
     {
         $this->teams->removeElement($teams);
     }

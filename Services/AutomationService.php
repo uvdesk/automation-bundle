@@ -2,7 +2,7 @@
 
 namespace Webkul\UVDesk\AutomationBundle\Services;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -15,7 +15,7 @@ class AutomationService
 	private $requestStack;
     private $entityManager;
 
-	public function __construct(ContainerInterface $container, RequestStack $requestStack, EntityManager $entityManager)
+	public function __construct(ContainerInterface $container, RequestStack $requestStack, EntityManagerInterface $entityManager)
 	{
 		$this->container = $container;
 		$this->requestStack = $requestStack;

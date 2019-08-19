@@ -3,6 +3,6 @@ helpdesk_automations_bundle_member_routing_resources:
     resource: "routes/private.yaml"
     prefix:   /{_locale}/%uvdesk_site_path.member_prefix%/
     requirements:
-        _locale: %app_locales%
+        _locale: '%app_locales%'
     defaults:
-        _locale: %locale%
+        _locale: '%locale%'

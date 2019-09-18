@@ -34,8 +34,11 @@ class PreparedResponsesRepository extends EntityRepository
         foreach ($data as $key => $value) {
             if(!in_array($key,$this->safeFields)) {
                 if($key!='dateUpdated' AND $key!='dateAdded' AND $key!='search') {
-                    $qb->Andwhere('pr.'.$key.' = :'.$key);
-                    $qb->setParameter($key, $value);
+                    $preparedResponsesColumns = $this->getEntityColumnValues();
+                    if (in_array($key, $preparedResponsesColumns)) {
+                        $qb->Andwhere('pr.'.$key.' = :'.$key);
+                        $qb->setParameter($key, $value);
+                    }
                 } else {
                     if($key == 'search') {
                         $qb->andwhere('pr.name'.' LIKE :name');
@@ -88,5 +91,9 @@ class PreparedResponsesRepository extends EntityRepository
             ->groupBy('pr.id');
             
         return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    public function getEntityColumnValues() {
+        return $this->getEntityManager()->getClassMetadata(PreparedResponses::class)->getColumnNames();
     }
 }

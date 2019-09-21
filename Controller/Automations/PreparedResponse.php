@@ -104,7 +104,7 @@ class PreparedResponse extends Controller
                     }
                     foreach($groups as $key => $groupId) {
                         if($groupId) {
-                            $group = $em->getRepository('UVDeskCoreBundle:SupportGroup')->findOneBy([ 'id' => $groupId]);
+                            $group = $em->getRepository('UVDeskCoreFrameworkBundle:SupportGroup')->findOneBy([ 'id' => $groupId]);
                             if($group && (empty($previousGroupIds) || !in_array($groupId, $previousGroupIds)) ) {
                                 $newWorkflow->addGroup($group);
                                 $em->persist($newWorkflow);
@@ -126,7 +126,7 @@ class PreparedResponse extends Controller
                     }
                     foreach($teams as $key => $teamId) {
                         if($teamId) {
-                            $team = $em->getRepository('UVDeskCoreBundle:SupportTeam')->findOneBy([ 'id' => $teamId]);
+                            $team = $em->getRepository('UVDeskCoreFrameworkBundle:SupportTeam')->findOneBy([ 'id' => $teamId]);
                             if($team && (empty($previousTeamIds) || !in_array($teamId, $previousTeamIds)) ) {
                                 $newWorkflow->addTeam($team);
                                 $em->persist($newWorkflow);
@@ -274,7 +274,7 @@ class PreparedResponse extends Controller
                     }
                     foreach($groups as $key => $groupId) {
                         if($groupId) {
-                            $group = $em->getRepository('UVDeskCoreBundle:SupportGroup')->findOneBy([ 'id' => $groupId]);
+                            $group = $em->getRepository('UVDeskCoreFrameworkBundle:SupportGroup')->findOneBy([ 'id' => $groupId]);
                             if($group && (empty($previousGroupIds) || !in_array($groupId, $previousGroupIds)) ) {
                                 $newWorkflow->addGroup($group);
                                 $em->persist($newWorkflow);
@@ -296,7 +296,7 @@ class PreparedResponse extends Controller
                     }
                     foreach($teams as $key => $teamId) {
                         if($teamId) {
-                            $team = $em->getRepository('UVDeskCoreBundle:SupportTeam')->findOneBy([ 'id' => $teamId]);
+                            $team = $em->getRepository('UVDeskCoreFrameworkBundle:SupportTeam')->findOneBy([ 'id' => $teamId]);
                             if($team && (empty($previousTeamIds) || !in_array($teamId, $previousTeamIds)) ) {
                                 $newWorkflow->addTeam($team);
                                 $em->persist($newWorkflow);

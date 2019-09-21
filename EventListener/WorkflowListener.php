@@ -3,7 +3,7 @@
 namespace Webkul\UVDesk\AutomationBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Webkul\UVDesk\CoreBundle\Entity\Ticket;
+use Webkul\UVDesk\CoreFrameworkBundle\Entity\Ticket;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Webkul\UVDesk\AutomationBundle\Entity\Workflow;
 use Symfony\Component\DependencyInjection\ContainerInterface;

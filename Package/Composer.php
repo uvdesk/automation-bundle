@@ -9,9 +9,8 @@ class Composer extends ComposerPackageExtension
 {
     public function loadConfiguration()
     {
-        $composerPackage = new ComposerPackage(new UVDeskAutomationConfiguration());
+        $composerPackage = new ComposerPackage();
         $composerPackage
-            ->movePackageConfig('config/routes/uvdesk_automations.yaml', 'Templates/routes.yaml')
             ->combineProjectConfig('config/packages/twig.yaml', 'Templates/twig.yaml');
         
         return $composerPackage;

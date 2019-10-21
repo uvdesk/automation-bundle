@@ -9,4 +9,5 @@ abstract class FunctionalGroup
     const AGENT = 'agent';
     const TICKET = 'ticket';
     const CUSTOMER = 'customer';
+    const USER = 'user';
 }

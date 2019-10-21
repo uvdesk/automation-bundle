@@ -28,6 +28,15 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'events' => ['uvdesk.agent.created']
         ],
         [
+            'name' => 'User Forgot Password',
+            'description' => 'Send an email to user with a link to reset their password.',
+            'conditions' => 'N;',
+            'actions' => 'a:1:{i:1;a:2:{s:4:"type";s:21:"uvdesk.user.mail_user";s:5:"value";s:1:"8";}}',
+            'status' => '1',
+            'sort_order' => '2',
+            'events' => ['uvdesk.user.forgot_password']
+        ],
+        [
             'name' => 'Ticket Created',
             'description' => 'Automate actions when ticket is created.',
             'conditions' => 'N;',
@@ -53,15 +62,6 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'status' => '1',
             'sort_order' => '5',
             'events' => ['uvdesk.ticket.customer_reply']
-        ],
-        [
-            'name' => 'Forgot Password',
-            'description' => 'Send customer an email on forgot password action.',
-            'conditions' => 'N;',
-            'actions' => 'a:1:{i:1;a:2:{s:4:"type";s:21:"uvdesk.user.mail_user";s:5:"value";s:1:"8";}}',
-            'status' => '1',
-            'sort_order' => '2',
-            'events' => ['uvdesk.user.forgot_password']
         ],
     ];
 

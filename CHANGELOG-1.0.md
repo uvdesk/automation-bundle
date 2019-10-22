@@ -3,6 +3,11 @@ CHANGELOG for 1.0.x
 
 This changelog references any relevant changes introduced in 1.0 minor versions.
 
+* 1.0.1 (2019-10-22)
+    * **Issue #24:** Enable customer/agent to reset password from single route
+    * **Misc. Updates:**
+        * Updated README.md with link to the official gitter chat for uvdesk/automation-bundle
+
 * 1.0.0 (Released on 2019-10-09)
     * **Issue #22:** Uncaught exception on the prepared responses page (raised by KlaasT)
     * **Issue #21:** Uncaught exception on the prepared responses page (raised by piyushwebkul)

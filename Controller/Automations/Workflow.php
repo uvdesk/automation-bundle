@@ -47,8 +47,6 @@ class Workflow extends Controller
         }
 
         if ($form->isSubmitted()) {
-          
-
             $formData = $request->request;
             $workflowClass = 'Webkul\UVDesk\AutomationBundle\Entity\Workflow';
             $workflowActionsArray = $request->request->get('actions');
@@ -215,6 +213,7 @@ class Workflow extends Controller
 
         if ($form->isSubmitted()) {
             $formData = $request->request;
+            
             $workflowClass = 'Webkul\UVDesk\AutomationBundle\Entity\Workflow';
             $workflowActionsArray = $request->request->get('actions');
 
@@ -248,7 +247,20 @@ class Workflow extends Controller
             }
 
             if (empty($workflowEventsArray)) {
-                $error['events'] = $this->translate('Warning! Please add valid Events!');
+                $error['events'][] = $this->translate('Warning! Please add valid Events!');
+            }
+
+            /*
+                @NOTICE: Events 'uvdesk.agent.forgot_password', 'uvdesk.customer.forgot_password' will be deprecated 
+                onwards uvdesk/automation-bundle:1.0.2 and uvdesk/core-framework:1.0.3 releases and will be 
+                completely removed with the next major release.
+            */
+            foreach ($workflowEventsArray as $eventAttributes) {
+                if ($eventAttributes['event'] == 'agent' && $eventAttributes['trigger'] == 'uvdesk.user.forgot_password') {
+                    $error['events'][] = $this->translate('"Agent Forgot Password" has been deprecated. Please use the "User Forgot Password" event instead.');
+                } else if ($eventAttributes['event'] == 'customer' && $eventAttributes['trigger'] == 'uvdesk.user.forgot_password') {
+                    $error['events'][] = $this->translate('"Customer Forgot Password" has been deprecated. Please use the "User Forgot Password" event instead.');
+                }
             }
 
             $workflowConditionsArray = $request->request->get('conditions');
@@ -278,12 +290,15 @@ class Workflow extends Controller
                 $newWorkflow->setActions($workflowActionsArray);
                 $newWorkflow->setDateAdded(new \Datetime);
                 $newWorkflow->setDateUpdated(new \Datetime);
-                
 
                 $formDataGetEvents = array_unique($formData->get('events'), SORT_REGULAR);
+
                 if ($newWorkflow->getWorkflowEvents()) {
                     foreach ($newWorkflow->getWorkflowEvents() as $newWorkflowEvent) {
-                        if ($thisKey = array_search(['event' => current($exNewEventEvent = explode('.', $newWorkflowEvent->getEvent())), 'trigger' => end($exNewEventEvent)], $formDataGetEvents)) {
+                        if ($thisKey = array_search([
+                            'event' => current($exNewEventEvent = explode('.', $newWorkflowEvent->getEvent())), 
+                            'trigger' => end($exNewEventEvent)
+                        ], $formDataGetEvents)) {
                             unset($formDataGetEvents[$thisKey]);
                         } else {
                             $entityManager->remove($newWorkflowEvent);
@@ -302,6 +317,7 @@ class Workflow extends Controller
                     $event->setEvent($eventEvents['trigger']);
                     $event->setWorkflow($newWorkflow);
                     $event->setEventId($newWorkflow->getId());
+
                     $entityManager->persist($event);
                     $entityManager->flush();
                 }
@@ -312,6 +328,12 @@ class Workflow extends Controller
                 );
 
                 return $this->redirectToRoute('helpdesk_member_workflow_collection');
+            } else {
+                if (!empty($error['events'])) {
+                    foreach ($error['events'] as $message) {
+                        $this->addFlash('warning', $this->get('translator')->trans("Events: " . $message));
+                    }
+                }
             }
 
             $formData = [

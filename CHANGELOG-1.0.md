@@ -3,9 +3,11 @@ CHANGELOG for 1.0.x
 
 This changelog references any relevant changes introduced in 1.0 minor versions.
 
-* 1.0.1 (2019-10-22)
+* 1.0.2 (2019-10-23)
     * **Issue #24:** Enable customer/agent to reset password from single route
     * **Misc. Updates:**
+        * Updated workflow fixtures following deprecated events from uvdesk/core-framework
+        * Added patch to support previously configured workflows with deprecated events from dependent package uvdesk/core-framework (agent.forgot_password, customer.forgot_password)
         * Updated README.md with link to the official gitter chat for uvdesk/automation-bundle
 
 * 1.0.0 (Released on 2019-10-09)

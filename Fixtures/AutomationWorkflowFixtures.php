@@ -22,7 +22,7 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'name' => 'Agent Created',
             'description' => 'Send agent a welcome email when their account is created.',
             'conditions' => 'N;',
-            'actions' => 'a:1:{i:1;a:2:{s:4:"type";s:23:"uvdesk.agent.mail_agent";s:5:"value";s:1:"3";}}',
+            'actions' => 'a:1:{i:0;a:2:{s:4:"type";s:23:"uvdesk.agent.mail_agent";s:5:"value";s:1:"4";}}',
             'status' => '1',
             'sort_order' => '2',
             'events' => ['uvdesk.agent.created']
@@ -31,7 +31,7 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'name' => 'User Forgot Password',
             'description' => 'Send an email to user with a link to reset their password.',
             'conditions' => 'N;',
-            'actions' => 'a:1:{i:1;a:2:{s:4:"type";s:21:"uvdesk.user.mail_user";s:5:"value";s:1:"8";}}',
+            'actions' => 'a:1:{i:1;a:2:{s:4:"type";s:21:"uvdesk.user.mail_user";s:5:"value";s:1:"1";}}',
             'status' => '1',
             'sort_order' => '2',
             'events' => ['uvdesk.user.forgot_password']
@@ -49,7 +49,7 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'name' => 'Agent Replied on Ticket',
             'description' => 'Send customer an email when reply is added on ticket.',
             'conditions' => 'N;',
-            'actions' => 'a:1:{i:2;a:2:{s:4:"type";s:27:"uvdesk.ticket.mail_customer";s:5:"value";s:1:"1";}}',
+            'actions' => 'a:1:{i:0;a:2:{s:4:"type";s:27:"uvdesk.ticket.mail_customer";s:5:"value";s:1:"2";}}',
             'status' => '1',
             'sort_order' => '5',
             'events' => ['uvdesk.ticket.agent_reply']
@@ -58,7 +58,7 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'name' => 'Customer Replied on Ticket',
             'description' => 'Send agent an email when reply is added on ticket.',
             'conditions' => 'N;',
-            'actions' => 'a:1:{i:1;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:1:{i:0;s:13:"assignedAgent";}s:5:"value";s:1:"6";}}}',
+            'actions' => 'a:1:{i:0;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:1:{i:0;s:13:"assignedAgent";}s:5:"value";s:1:"6";}}}',
             'status' => '1',
             'sort_order' => '5',
             'events' => ['uvdesk.ticket.customer_reply']

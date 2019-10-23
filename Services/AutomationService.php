@@ -25,6 +25,7 @@ class AutomationService
     public function getWorkflowEvents()
     {
         return [
+            FunctionalGroup::USER => 'User',
             FunctionalGroup::AGENT => 'Agent',
             FunctionalGroup::CUSTOMER => 'Customer',
             FunctionalGroup::TICKET => 'Ticket',

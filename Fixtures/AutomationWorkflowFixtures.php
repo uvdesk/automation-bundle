@@ -63,16 +63,6 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'sort_order' => '5',
             'events' => ['uvdesk.ticket.customer_reply']
         ],
-        [
-            'name' => 'Agent forwarded on Ticket',
-            'description' => 'Send agent an email when forward is added on ticket.',
-            'conditions' => 'N;',
-            'actions' => 'a:1:{i:0;a:2:{s:4:"type";s:27:"uvdesk.ticket.forward_mail";s:5:"value";s:1:"9";}}',
-            'status' => '1',
-            'sort_order' => '5',
-            'events' => ['uvdesk.ticket.forward_added']   
-
-        ]
     ];
 
     public function load(ObjectManager $entityManager)

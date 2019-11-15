@@ -16,6 +16,11 @@ class PreparedResponses implements QuickActionButtonInterface
         $this->requestStack = $requestStack;
     }
 
+    public static function getRoles() : array
+    {
+        return ['ROLE_AGENT_MANAGE_WORKFLOW_MANUAL'];
+    }
+
     public function renderTemplate(TwigEnvironment $twig)
     {
         return $twig->render('@UVDeskAutomation/tickets/quick-actions/prepared-responses.html.twig', [

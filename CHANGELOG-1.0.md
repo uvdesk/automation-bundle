@@ -6,6 +6,7 @@ This changelog references any relevant changes introduced in 1.0 minor versions.
 * 1.0.3 (2019-11-15)
     * **Misc. Updates:**
         * Included Github issue templates
+        * Updated composer dependencies & set minimum required php version to 7.2
 
 * 1.0.2 (2019-10-23)
     * **Issue #24:** Enable customer/agent to reset password from single route

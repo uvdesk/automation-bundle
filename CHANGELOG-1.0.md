@@ -3,6 +3,11 @@ CHANGELOG for 1.0.x
 
 This changelog references any relevant changes introduced in 1.0 minor versions.
 
+* 1.0.4 (2020-02-12)
+    * **Issue #30:** Prepared response (ticket quick action button) always enabled irrespective of assigned privileges
+    * **Misc. Updates:**
+        * Included Github issue templates(Not showing issue resolved)
+
 * 1.0.3 (2019-11-15)
     * **Misc. Updates:**
         * Included Github issue templates

@@ -35,35 +35,35 @@ abstract class Action
         {
             case 'en':
                 $translator->addLoader('yaml', new YamlFileLoader()); 
-                $translator->addResource('yaml',__DIR__."/../../../../../translations/messages.en.yml", 'en');
+                $translator->addResource('yaml',__DIR__."/../../../../translations/messages.en.yml", 'en');
                 break;
             case 'es':
                 $translator->addLoader('yaml', new YamlFileLoader()); 
-                $translator->addResource('yaml',__DIR__."/../../../../../translations/messages.es.yml", 'es');
+                $translator->addResource('yaml',__DIR__."/../../../../translations/messages.es.yml", 'es');
                 break;
             case 'fr':
                 $translator->addLoader('yaml', new YamlFileLoader()); 
-                $translator->addResource('yaml',__DIR__."/../../../../../translations/messages.fr.yml", 'fr');
+                $translator->addResource('yaml',__DIR__."/../../../../translations/messages.fr.yml", 'fr');
                 break;
             case 'da':
                 $translator->addLoader('yaml', new YamlFileLoader()); 
-                $translator->addResource('yaml',__DIR__."/../../../../../translations/messages.da.yml", 'da');
+                $translator->addResource('yaml',__DIR__."/../../../../translations/messages.da.yml", 'da');
                 break;
             case 'de':
                 $translator->addLoader('yaml', new YamlFileLoader()); 
-                $translator->addResource('yaml',__DIR__."/../../../../../translations/messages.de.yml", 'de');
+                $translator->addResource('yaml',__DIR__."/../../../../translations/messages.de.yml", 'de');
                 break;
             case 'it':
                 $translator->addLoader('yaml', new YamlFileLoader()); 
-                $translator->addResource('yaml',__DIR__."/../../../../../translations/messages.it.yml", 'it');
+                $translator->addResource('yaml',__DIR__."/../../../../translations/messages.it.yml", 'it');
                 break;
             case 'ar':
                 $translator->addLoader('yaml', new YamlFileLoader()); 
-                $translator->addResource('yaml',__DIR__."/../../../../../translations/messages.ar.yml", 'ar');
+                $translator->addResource('yaml',__DIR__."/../../../../translations/messages.ar.yml", 'ar');
                 break;
             case 'tr':
                 $translator->addLoader('yaml', new YamlFileLoader()); 
-                $translator->addResource('yaml',__DIR__."/../../../../../translations/messages.tr.yml", 'tr');
+                $translator->addResource('yaml',__DIR__."/../../../../translations/messages.tr.yml", 'tr');
                 break;
         }
 

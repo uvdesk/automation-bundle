@@ -51,7 +51,7 @@ class PreparedResponseXHR extends Controller
             $em->flush();
 
             $json['alertClass'] = 'success';
-            $json['alertMessage'] = 'Success ! Prepared response removed successfully.';
+            $json['alertMessage'] = $this->get('translator')->trans('Success ! Prepared response removed successfully.');
         }
 
         $response = new Response(json_encode($json));

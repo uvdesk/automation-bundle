@@ -73,10 +73,6 @@ class PreparedResponse extends Controller
                 $error['actions'] = $this->translate('Warning! Please add valid Actions!');
             }
 
-            if ($workflowEventType && array_values($workflowEventsArray)[0]['event'] != $workflowEventType) {
-                $error['events'] = $this->translate('Warning! In Free Plan you can not change Events!');
-            }
-
             if (empty($error)) {
                 // Check if new workflow and old one belong to the same class
                 if (!empty($workflow) && $workflow instanceof $workflowClass) {

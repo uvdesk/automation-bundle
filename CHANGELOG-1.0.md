@@ -3,6 +3,11 @@ CHANGELOG for 1.0.x
 
 This changelog references any relevant changes introduced in 1.0 minor versions.
 
+* 1.0.5 (2020-03-17)
+    * **Issue #31:** Exception to access workflow & prepared response section menus.
+    * **Misc. Updates:**
+        * Added Missing translations.
+
 * 1.0.4 (2020-02-12)
     * **Issue #30:** Prepared response (ticket quick action button) always enabled irrespective of assigned privileges
     * **Misc. Updates:**

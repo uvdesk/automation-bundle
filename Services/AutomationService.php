@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Webkul\UVDesk\AutomationBundle\Workflow\FunctionalGroup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AutomationService
 {
@@ -15,20 +16,21 @@ class AutomationService
 	private $requestStack;
     private $entityManager;
 
-	public function __construct(ContainerInterface $container, RequestStack $requestStack, EntityManagerInterface $entityManager)
+	public function __construct(ContainerInterface $container, RequestStack $requestStack, EntityManagerInterface $entityManager, TranslatorInterface $translator)
 	{
 		$this->container = $container;
 		$this->requestStack = $requestStack;
         $this->entityManager = $entityManager;
+        $this->translator = $translator;
     }
 
     public function getWorkflowEvents()
     {
         return [
-            FunctionalGroup::USER => 'User',
-            FunctionalGroup::AGENT => 'Agent',
-            FunctionalGroup::CUSTOMER => 'Customer',
-            FunctionalGroup::TICKET => 'Ticket',
+            FunctionalGroup::USER => $this->translator->trans('User'),
+            FunctionalGroup::AGENT => $this->translator->trans('Agent'),
+            FunctionalGroup::CUSTOMER => $this->translator->trans('Customer'),
+            FunctionalGroup::TICKET => $this->translator->trans('Ticket'),
         ];
     }
 
@@ -43,7 +45,7 @@ class AutomationService
                 $ticketEventCollection[$functionalGroup] = [];
             }
 
-            $ticketEventCollection[$functionalGroup][$workflowDefinition->getId()] = $workflowDefinition->getDescription();
+            $ticketEventCollection[$functionalGroup][$workflowDefinition->getId()] = $this->translator->trans($workflowDefinition->getDescription());
         }
 
         return $ticketEventCollection;
@@ -55,81 +57,81 @@ class AutomationService
             'ticket' => [
                 'mail' => [
                     [
-                        'lable' => 'From Email',
+                        'lable' => $this->translator->trans('From Email'),
                         'value' => 'from_mail',
                         'match' => 'email'
                     ],
                     [
-                        'lable' => 'To Email',
+                        'lable' => $this->translator->trans('To Email'),
                         'value' => 'to_mail',
                         'match' => 'email'
                     ],
                 ],
                 'ticket' => [
                     [
-                        'lable' => 'Subject',
+                        'lable' => $this->translator->trans('Subject'),
                         'value' => 'subject',
                         'match' => 'string'
                     ],
                     [
-                        'lable' => 'Description',
+                        'lable' => $this->translator->trans('Description'),
                         'value' => 'description',
                         'match' => 'string'
                     ],
                     [
-                        'lable' => 'Subject or Description',
+                        'lable' => $this->translator->trans('Subject or Description'),
                         'value' => 'subject_or_description',
                         'match' => 'string'
                     ],
                     [
-                        'lable' => 'Priority',
+                        'lable' => $this->translator->trans('Priority'),
                         'value' => 'TicketPriority',
                         'match' => 'select'
                     ],
                     [
-                        'lable' => 'Type',
+                        'lable' => $this->translator->trans('Type'),
                         'value' => 'TicketType',
                         'match' => 'select'
                     ],
                     [
-                        'lable' => 'Status',
+                        'lable' => $this->translator->trans('Status'),
                         'value' => 'TicketStatus',
                         'match' => 'select'
                     ],
                     [
-                        'lable' => 'Source',
+                        'lable' => $this->translator->trans('Source'),
                         'value' => 'source',
                         'match' => 'select'
                     ],
                     [
-                        'lable' => 'Created',
+                        'lable' => $this->translator->trans('Created'),
                         'value' => 'created',
                         'match' => 'date'
                     ],
                     [
-                        'lable' => 'Agent',
+                        'lable' => $this->translator->trans('Agent'),
                         'value' => 'agent',
                         'match' => 'select'
                     ],
                     [
-                        'lable' => 'Group',
+                        'lable' => $this->translator->trans('Group'),
                         'value' => 'group',
                         'match' => 'select'
                     ],
                     [
-                        'lable' => 'Team',
+                        'lable' => $this->translator->trans('Team'),
                         'value' => 'team',
                         'match' => 'select'
                     ],
                 ],
                 'customer' => [
                     [
-                        'lable' => 'Customer Name',
+                        'lable' => $this->translator->trans('Customer Name'),
                         'value' => 'customer_name',
                         'match' => 'string'
                     ],
                     [
-                        'lable' => 'Customer Email',
+                        'lable' => $this->translator->trans('Customer Email'),
                         'value' => 'customer_email',
                         'match' => 'email'
                     ],
@@ -145,131 +147,131 @@ class AutomationService
         return [
             'email' => [
                 [
-                    'lable' => 'Is Equal To',
+                    'lable' => $this->translator->trans('Is Equal To'),
                     'value' => 'is'
                 ],
                 [
-                    'lable' => 'Is Not Equal To',
+                    'lable' => $this->translator->trans('Is Not Equal To'),
                     'value' => 'isNot'
                 ],
                 [
-                    'lable' => 'Contains',
+                    'lable' => $this->translator->trans('Contains'),
                     'value' => 'contains'
                 ],
                 [
-                    'lable' => 'Does Not Contain',
+                    'lable' => $this->translator->trans('Does Not Contain'),
                     'value' => 'notContains'
                 ],
             ],
             'string' => [
                 [
-                    'lable' => 'Is Equal To',
+                    'lable' => $this->translator->trans('Is Equal To'),
                     'value' => 'is'
                 ],
                 [
-                    'lable' => 'Is Not Equal To',
+                    'lable' => $this->translator->trans('Is Not Equal To'),
                     'value' => 'isNot'
                 ],
                 [
-                    'lable' => 'Contains',
+                    'lable' => $this->translator->trans('Contains'),
                     'value' => 'contains'
                 ],
                 [
-                    'lable' => 'Does Not Contain',
+                    'lable' => $this->translator->trans('Does Not Contain'),
                     'value' => 'notContains'
                 ],
                 [
-                    'lable' => 'Starts With',
+                    'lable' => $this->translator->trans('Starts With'),
                     'value' => 'startWith'
                 ],
                 [
-                    'lable' => 'Ends With',
+                    'lable' => $this->translator->trans('Ends With'),
                     'value' => 'endWith'
                 ],
             ],
             'select' => [
                 [
-                    'lable' => 'Is Equal To',
+                    'lable' => $this->translator->trans('Is Equal To'),
                     'value' => 'is'
                 ],
                 [
-                    'lable' => 'Is Not Equal To',
+                    'lable' => $this->translator->trans('Is Not Equal To'),
                     'value' => 'isNot'
                 ],
             ],
             'date' => [
                 [
-                    'lable' => 'Before',
+                    'lable' => $this->translator->trans('Before'),
                     'value' => 'before'
                 ],
                 [
-                    'lable' => 'Before On',
+                    'lable' => $this->translator->trans('Before On'),
                     'value' => 'beforeOn'
                 ],
                 [
-                    'lable' => 'After',
+                    'lable' => $this->translator->trans('After'),
                     'value' => 'after'
                 ],
                 [
-                    'lable' => 'After On',
+                    'lable' => $this->translator->trans('After On'),
                     'value' => 'afterOn'
                 ],
             ],
             'datetime' => [
                 [
-                    'lable' => 'Before',
+                    'lable' => $this->translator->trans('Before'),
                     'value' => 'beforeDateTime'
                 ],
                 [
-                    'lable' => 'Before On',
+                    'lable' => $this->translator->trans('Before On'),
                     'value' => 'beforeDateTimeOn'
                 ],
                 [
-                    'lable' => 'After',
+                    'lable' => $this->translator->trans('After'),
                     'value' => 'afterDateTime'
                 ],
                 [
-                    'lable' => 'After On',
+                    'lable' => $this->translator->trans('After On'),
                     'value' => 'afterDateTimeOn'
                 ],
             ],
             'time' => [
                 [
-                    'lable' => 'Before',
+                    'lable' => $this->translator->trans('Before'),
                     'value' => 'beforeTime'
                 ],
                 [
-                    'lable' => 'Before On',
+                    'lable' => $this->translator->trans('Before On'),
                     'value' => 'beforeTimeOn'
                 ],
                 [
-                    'lable' => 'After',
+                    'lable' => $this->translator->trans('After'),
                     'value' => 'afterTime'
                 ],
                 [
-                    'lable' => 'After On',
+                    'lable' => $this->translator->trans('After On'),
                     'value' => 'afterTimeOn'
                 ],
             ],
             'number' => [
                 [
-                    'lable' => 'Is Equal To',
+                    'lable' => $this->translator->trans('Is Equal To'),
                     'value' => 'is'
                 ],
                 [
-                    'lable' => 'Is Not Equal To',
+                    'lable' => $this->translator->trans('Is Not Equal To'),
                     'value' => 'isNot'
                 ],
                 [
-                    'lable' => 'Contains',
+                    'lable' => $this->translator->trans('Contains'),
                     'value' => 'contains'
                 ],
                 [
-                    'lable' => 'Greater Than',
+                    'lable' => $this->translator->trans('Greater Than'),
                     'value' => 'greaterThan'
                 ],
                 [
-                    'lable' => 'Less Than',
+                    'lable' => $this->translator->trans('Less Than'),
                     'value' => 'lessThan'
                 ],
             ],
@@ -288,7 +290,7 @@ class AutomationService
                 $workflowActions[$functionalGroup] = [];
             }
 
-            $workflowActions[$functionalGroup][$workflowDefinition->getId()] = $workflowDefinition->getDescription();
+            $workflowActions[$functionalGroup][$workflowDefinition->getId()] = $this->translator->trans($workflowDefinition->getDescription());
         }
 
         return $workflowActions;
@@ -306,7 +308,7 @@ class AutomationService
                 $preparedResponseActions[$functionalGroup] = [];
             }
 
-            $preparedResponseActions[$functionalGroup][$preparedResponseDefinition->getId()] = $preparedResponseDefinition->getDescription();
+            $preparedResponseActions[$functionalGroup][$preparedResponseDefinition->getId()] = $this->translator->trans($preparedResponseDefinition->getDescription());
         }
 
         return $preparedResponseActions;

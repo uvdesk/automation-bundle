@@ -3,6 +3,11 @@ CHANGELOG for 1.0.x
 
 This changelog references any relevant changes introduced in 1.0 minor versions.
 
+* 1.0.6 (2020-04-17)
+    * **Misc. Updates:**
+        * Added missing translation for some words in workflow and prepared response.
+        * Change processing function and removed unnecessary code for speed up.
+
 * 1.0.5 (2020-03-17)
     * **Issue #31:** Exception to access workflow & prepared response section menus.
     * **Misc. Updates:**

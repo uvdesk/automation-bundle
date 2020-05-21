@@ -198,7 +198,7 @@ class WorkflowListener
                 break;
             case 'description':
                 if (isset($condition['value']) && $entity instanceof Ticket) {
-                    $reply = $entity->createdThread->getReply();
+                    $reply = $entity->createdThread->getMessage();
                     $reply = rtrim(strip_tags($reply), "\n" );
                     return $this->match($condition['match'], rtrim($reply), $condition['value']);
                 }

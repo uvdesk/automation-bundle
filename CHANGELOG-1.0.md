@@ -3,6 +3,9 @@ CHANGELOG for 1.0.x
 
 This changelog references any relevant changes introduced in 1.0 minor versions.
 
+* 1.0.7 (2020-05-26)
+    * **Issue #32:** Getting exception when workflow contains description condition while ticket create.
+
 * 1.0.6 (2020-04-17)
     * **Misc. Updates:**
         * Added missing translation for some words in workflow and prepared response.

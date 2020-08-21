@@ -4,9 +4,9 @@ namespace Webkul\UVDesk\AutomationBundle\Controller\Automations;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class WorkflowXHR extends Controller
+class WorkflowXHR extends AbstractController
 {
     public function workflowsListXhr(Request $request)
     {

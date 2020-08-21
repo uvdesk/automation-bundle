@@ -4,11 +4,11 @@ namespace Webkul\UVDesk\AutomationBundle\Controller\Automations;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Webkul\UVDesk\AutomationBundle\Form\DefaultForm;
 use Webkul\UVDesk\AutomationBundle\Entity;
 
-class Workflow extends Controller
+class Workflow extends AbstractController
 {
 
     const ROLE_REQUIRED_AUTO = 'ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC';

@@ -5,12 +5,29 @@ namespace Webkul\UVDesk\AutomationBundle\Controller\Automations;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
+use Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener;
+use Symfony\Component\Translation\TranslatorInterface;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\TicketService;
 
 class WorkflowXHR extends AbstractController
 {
+    private $userService;
+    private $translator;
+    private $workflowListnerService;
+    private $ticketService;
+    
+    public function __construct(UserService $userService, WorkflowListener $workflowListnerService, TicketService $ticketService,TranslatorInterface $translator)
+    {
+        $this->userService = $userService;
+        $this->ticketService = $ticketService;
+        $this->workflowListnerService = $workflowListnerService;
+        $this->translator = $translator;
+    }
+
     public function workflowsListXhr(Request $request)
     {
-        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
+        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -25,7 +42,7 @@ class WorkflowXHR extends AbstractController
 
     public function WorkflowsxhrAction(Request $request)
     {
-        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
+        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
         
@@ -52,7 +69,7 @@ class WorkflowXHR extends AbstractController
                 }
                 if(!$error) {
                     $json['alertClass'] = 'success';
-                    $json['alertMessage'] = $this->get('translator')->trans('Success! Order has been updated successfully.');
+                    $json['alertMessage'] = $this->translator->trans('Success! Order has been updated successfully.');
                 }
             }
             elseif($request->getMethod() == 'DELETE') {
@@ -73,13 +90,13 @@ class WorkflowXHR extends AbstractController
 
                 if (!$error) {
                     $json['alertClass'] = 'success';
-                    $json['alertMessage'] = $this->get('translator')->trans('Success! Workflow has been removed successfully.');
+                    $json['alertMessage'] = $this->translator->trans('Success! Workflow has been removed successfully.');
                 }
             }
         }
         if($error){
             $json['alertClass'] = 'danger';
-            $json['alertMessage'] = $this->get('translator')->trans('Warning! You are not allowed to perform this action.');
+            $json['alertMessage'] = $this->translator->trans('Warning! You are not allowed to perform this action.');
         }
         $response = new Response(json_encode($json));
         $response->headers->set('Content-Type', 'application/json');
@@ -102,21 +119,21 @@ class WorkflowXHR extends AbstractController
 
         switch ($entity) {
             case 'team':
-                $json = json_encode($this->get('user.service')->getSupportTeams());
+                $json = json_encode($this->userService->getSupportTeams());
                 break;
             case 'group':
-                $json = $this->get('user.service')->getSupportGroups();
+                $json = $this->userService->getSupportGroups();
                 break;
             case 'stage':
                 $json = $this->get('task.service')->getStages();
                 break;
             case 'TicketType':
-                $json = $this->get('ticket.service')->getTypes();
+                $json = $this->ticketService->getTypes();
                 break;
             case 'agent':
             case 'agent_name':
                 $defaultAgent = ['id' => 'actionPerformingAgent', 'name' => 'Action Performing Agent'];
-                $agentList = $this->get('user.service')->getAgentPartialDataCollection();
+                $agentList = $this->userService->getAgentPartialDataCollection();
                 array_push($agentList, $defaultAgent);
 
                 $json = json_encode(array_map(function($item) {
@@ -133,11 +150,11 @@ class WorkflowXHR extends AbstractController
                         'id' => $result['id'],
                         'name' => $result['email'],
                     ];
-                }, $this->get('user.service')->getAgentsPartialDetails()));
+                }, $this->userService->getAgentsPartialDetails()));
 
                 break;
             case 'source':
-                $allSources = $this->container->get('ticket.service')->getAllSources();
+                $allSources = $this->ticketService->getAllSources();
                 $results = [];
                 foreach($allSources as $key => $source) {
                         $results[] = [
@@ -173,7 +190,7 @@ class WorkflowXHR extends AbstractController
 
     public function getWorkflowActionOptionsXHR($entity, Request $request)
     {
-        foreach ($this->get('uvdesk.automations.workflows')->getRegisteredWorkflowActions() as $workflowAction) {
+        foreach ($this->workflowListnerService->getRegisteredWorkflowActions() as $workflowAction) {
             if ($workflowAction->getId() == $entity) {
                 $options = $workflowAction->getOptions($this->container);
                 

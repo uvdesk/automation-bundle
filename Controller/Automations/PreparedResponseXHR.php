@@ -3,7 +3,7 @@
 namespace Webkul\UVDesk\AutomationBundle\Controller\Automations;
 
 use Doctrine\Common\Collections\Criteria;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -14,7 +14,7 @@ use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
 use Symfony\Component\Translation\TranslatorInterface;
 use Webkul\UVDesk\AutomationBundle\EventListener\PreparedResponseListener;
 
-class PreparedResponseXHR extends AbstractController
+class PreparedResponseXHR extends Controller
 {
     const ROLE_REQUIRED_MANUAL = 'ROLE_AGENT_MANAGE_WORKFLOW_MANUAL';
     const LIMIT = 20;

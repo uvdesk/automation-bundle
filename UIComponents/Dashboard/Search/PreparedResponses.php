@@ -30,6 +30,11 @@ SVG;
         return 'prepare_response_action';
     }
 
+    public static function getRoles() : array
+    {
+        return ['ROLE_AGENT_MANAGE_WORKFLOW_MANUAL'];
+    }
+
     public function getChildrenRoutes() : array
     {
         return [];

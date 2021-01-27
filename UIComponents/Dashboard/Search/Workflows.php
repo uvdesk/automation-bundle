@@ -30,6 +30,11 @@ SVG;
         return 'helpdesk_member_workflow_collection';
     }
 
+    public static function getRoles() : array
+    {
+        return ['ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC'];
+    }
+
     public function getChildrenRoutes() : array
     {
         return [];

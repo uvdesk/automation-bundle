@@ -37,12 +37,21 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'events' => ['uvdesk.user.forgot_password']
         ],
         [
+            'name' => 'Ticket Agent Update - Mail to Agent',
+            'description' => 'Send an email to updated agent on ticket',
+            'conditions' => 'N;',
+            'actions' => 'a:1:{i:1;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:1:{i:0;s:13:"assignedAgent";}s:5:"value";s:1:"5";}}}',
+            'status' => '1',
+            'sort_order' => '3',
+            'events' => ['uvdesk.ticket.agent_updated']
+        ],
+        [
             'name' => 'Ticket Created',
             'description' => 'Automate actions when ticket is created.',
             'conditions' => 'N;',
-            'actions' => 'a:3:{i:0;a:2:{s:4:"type";s:27:"uvdesk.ticket.mail_customer";s:5:"value";s:1:"7";}i:1;a:2:{s:4:"type";s:26:"uvdesk.ticket.assign_agent";s:5:"value";s:18:"responsePerforming";}i:2;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:1:{i:0;s:13:"assignedAgent";}s:5:"value";s:1:"2";}}}',
+            'actions' => 'a:3:{i:0;a:2:{s:4:"type";s:27:"uvdesk.ticket.mail_customer";s:5:"value";s:1:"7";}i:1;a:2:{s:4:"type";s:26:"uvdesk.ticket.assign_agent";s:5:"value";s:18:"responsePerforming";}i:2;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:2:{i:0;s:13:"assignedAgent";i:1;s:1:"5";}s:5:"value";s:1:"3";}}}',
             'status' => '1',
-            'sort_order' => '5',
+            'sort_order' => '4',
             'events' => ['uvdesk.ticket.created']
         ],
         [
@@ -60,7 +69,7 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'conditions' => 'N;',
             'actions' => 'a:1:{i:0;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:1:{i:0;s:13:"assignedAgent";}s:5:"value";s:1:"6";}}}',
             'status' => '1',
-            'sort_order' => '5',
+            'sort_order' => '6',
             'events' => ['uvdesk.ticket.customer_reply']
         ],
     ];

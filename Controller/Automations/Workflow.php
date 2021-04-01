@@ -4,11 +4,14 @@ namespace Webkul\UVDesk\AutomationBundle\Controller\Automations;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Webkul\UVDesk\AutomationBundle\Form\DefaultForm;
 use Webkul\UVDesk\AutomationBundle\Entity;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
+use Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class Workflow extends Controller
+class Workflow extends AbstractController
 {
 
     const ROLE_REQUIRED_AUTO = 'ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC';
@@ -19,9 +22,20 @@ class Workflow extends Controller
     const NAME_LENGTH = 100;
     const DESCRIPTION_LENGTH = 200;
     
+    private $userService;
+    private $translator;
+    private $workflowListnerService;
+    
+    public function __construct(UserService $userService, WorkflowListener $workflowListnerService,TranslatorInterface $translator)
+    {
+        $this->userService = $userService;
+        $this->workflowListnerService = $workflowListnerService;
+        $this->translator = $translator;
+    }
+
     public function listWorkflowCollection(Request $request)
     {
-        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
+        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -31,7 +45,7 @@ class Workflow extends Controller
     // Creating workflow
     public function createWorkflow(Request $request)
     {
-        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
+        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -138,8 +152,8 @@ class Workflow extends Controller
                 }
 
                 $this->addFlash('success', $request->attributes->get('id')
-                    ? $this->get('translator')->trans('Success! Workflow has been updated successfully.')
-                    :  $this->get('translator')->trans('Success! Workflow has been added successfully.')
+                    ? $this->translator->trans('Success! Workflow has been updated successfully.')
+                    :  $this->translator->trans('Success! Workflow has been added successfully.')
                 );
 
                 return $this->redirectToRoute('helpdesk_member_workflow_collection');
@@ -166,7 +180,7 @@ class Workflow extends Controller
 
     public function editWorkflow(Request $request)
     {
-        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
+        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -188,7 +202,7 @@ class Workflow extends Controller
                 ];
 
                 foreach ($workflow->getWorkflowEvents() as $event) {
-                    $eventDefinition = $this->get('uvdesk.automations.workflows')->getRegisteredWorkflowEvent($event->getEvent());
+                    $eventDefinition = $this->workflowListnerService->getRegisteredWorkflowEvent($event->getEvent());
 
                     if (!empty($eventDefinition)) {
                         $formData['events'][] = [
@@ -323,15 +337,15 @@ class Workflow extends Controller
                 }
 
                 $this->addFlash('success', $request->attributes->get('id')
-                    ? $this->get('translator')->trans('Success! Workflow has been updated successfully.')
-                    :  $this->get('translator')->trans('Success! Workflow has been added successfully.')
+                    ? $this->translator->trans('Success! Workflow has been updated successfully.')
+                    :  $this->translator->trans('Success! Workflow has been added successfully.')
                 );
 
                 return $this->redirectToRoute('helpdesk_member_workflow_collection');
             } else {
                 if (!empty($error['events'])) {
                     foreach ($error['events'] as $message) {
-                        $this->addFlash('warning', $this->get('translator')->trans("Events: " . $message));
+                        $this->addFlash('warning', $this->translator->trans("Events: " . $message));
                     }
                 }
             }
@@ -362,6 +376,6 @@ class Workflow extends Controller
     } 
     public function translate($string,$params = array())
     {
-        return $this->get('translator')->trans($string,$params);
+        return $this->translator->trans($string,$params);
     }
 }

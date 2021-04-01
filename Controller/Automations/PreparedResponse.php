@@ -3,16 +3,17 @@
 namespace Webkul\UVDesk\AutomationBundle\Controller\Automations;
 
 use Doctrine\Common\Collections\Criteria;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Webkul\UVDesk\AutomationBundle\Form\DefaultForm;
 use Webkul\UVDesk\AutomationBundle\Entity;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
+use Symfony\Component\Translation\TranslatorInterface;
 
-
-class PreparedResponse extends Controller
+class PreparedResponse extends AbstractController
 {
     const ROLE_REQUIRED_MANUAL = 'ROLE_AGENT_MANAGE_WORKFLOW_MANUAL';
     const LIMIT = 20;
@@ -21,9 +22,18 @@ class PreparedResponse extends Controller
     const NAME_LENGTH = 100;
     const DESCRIPTION_LENGTH = 200;
 
+    private $userService;
+    private $translator;
+
+    public function __construct(UserService $userService, TranslatorInterface $translator)
+    {
+        $this->userService = $userService;
+        $this->translator = $translator;
+    }
+
     public function prepareResponseList(Request $request)
     {
-        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
+        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -32,7 +42,7 @@ class PreparedResponse extends Controller
 
     public function createPrepareResponse(Request $request)
     {
-        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
+        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -85,7 +95,7 @@ class PreparedResponse extends Controller
                     }
                 }
 
-                if ($this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
+                if ($this->userService->isAccessAuthorized('ROLE_ADMIN')) {
                     /* groups */ 
                     $groups = explode(',', $request->request->get('tempGroups'));
                     $previousGroupIds = [];
@@ -135,12 +145,12 @@ class PreparedResponse extends Controller
                 $newWorkflow->setDescription($formData->get('description'));
                 $newWorkflow->setStatus($formData->get('status') == 'on' ? true : false);
 
-                $userData = $this->get('user.service')->getUserDetailById($this->getUser()->getId());
+                $userData = $this->userService->getUserDetailById($this->getUser()->getId());
                 if (!$newWorkflow->getUser()) {
                     $newWorkflow->setUser($userData);
                 }
 
-                if($newWorkflow->getUser()->getId() == $userData->getId() || $this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
+                if($newWorkflow->getUser()->getId() == $userData->getId() || $this->userService->isAccessAuthorized('ROLE_ADMIN')) {
                     $newWorkflow->setActions($workflowActionsArray);
                 }
 
@@ -149,8 +159,8 @@ class PreparedResponse extends Controller
                 $entityManager->flush();
 
                 $this->addFlash('success', $request->attributes->get('id')
-                    ? $this->get('translator')->trans('Success! Prepared Response has been updated successfully.')
-                    :  $this->get('translator')->trans('Success! Prepared Response has been added successfully.')
+                    ? $this->translator->trans('Success! Prepared Response has been updated successfully.')
+                    :  $this->translator->trans('Success! Prepared Response has been added successfully.')
                 );
 
                 return $this->redirectToRoute('prepare_response_action');
@@ -178,7 +188,7 @@ class PreparedResponse extends Controller
 
     public function editPrepareResponse(Request $request)
     {
-        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
+        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -255,7 +265,7 @@ class PreparedResponse extends Controller
                     }
                 }
                 
-                if ($this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
+                if ($this->userService->isAccessAuthorized('ROLE_ADMIN')) {
                     /* groups */ 
                     $groups = explode(',', $request->request->get('tempGroups'));
                     $previousGroupIds = [];
@@ -305,12 +315,12 @@ class PreparedResponse extends Controller
                 $newWorkflow->setDescription($formData->get('description'));
                 $newWorkflow->setStatus($formData->get('status') == 'on' ? true : false);
 
-                $userData = $this->get('user.service')->getUserDetailById($this->getUser()->getId());
+                $userData = $this->userService->getUserDetailById($this->getUser()->getId());
                 if (!$newWorkflow->getUser()) {
                     $newWorkflow->setUser($userData);
                 }
 
-                if ($newWorkflow->getUser()->getId() == $userData->getId() || $this->get('user.service')->isAccessAuthorized('ROLE_ADMIN')) {
+                if ($newWorkflow->getUser()->getId() == $userData->getId() || $this->userService->isAccessAuthorized('ROLE_ADMIN')) {
                     $newWorkflow->setActions($workflowActionsArray);
                 }
 
@@ -319,8 +329,8 @@ class PreparedResponse extends Controller
                 $entityManager->flush();
 
                 $this->addFlash('success', $request->attributes->get('id')
-                    ? $this->get('translator')->trans('Success! Prepared Response has been updated successfully.')
-                    :  $this->get('translator')->trans('Success! Prepared Response has been added successfully.')
+                    ? $this->translator->trans('Success! Prepared Response has been updated successfully.')
+                    :  $this->translator->trans('Success! Prepared Response has been added successfully.')
                 );
 
                 return $this->redirectToRoute('prepare_response_action');

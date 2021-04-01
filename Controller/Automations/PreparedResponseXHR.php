@@ -10,7 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Webkul\UVDesk\AutomationBundle\Form;
 use Webkul\UVDesk\AutomationBundle\Entity;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-
+use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
+use Symfony\Component\Translation\TranslatorInterface;
+use Webkul\UVDesk\AutomationBundle\EventListener\PreparedResponseListener;
 
 class PreparedResponseXHR extends Controller
 {
@@ -21,9 +23,20 @@ class PreparedResponseXHR extends Controller
     const NAME_LENGTH = 100;
     const DESCRIPTION_LENGTH = 200;
 
+    private $userService;
+    private $translator;
+    private $preparedResponseListner;
+
+    public function __construct(UserService $userService, PreparedResponseListener $preparedResponseListner ,TranslatorInterface $translator)
+    {
+        $this->userService = $userService;
+        $this->translator = $translator;
+        $this->preparedResponseListner = $preparedResponseListner;
+    }
+
     public function prepareResponseListXhr(Request $request)
     {
-        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {          
+        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {          
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -37,7 +50,7 @@ class PreparedResponseXHR extends Controller
 
     public function prepareResponseDeleteXhr(Request $request)
     {
-        if (!$this->get('user.service')->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {          
+        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {          
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -51,7 +64,7 @@ class PreparedResponseXHR extends Controller
             $em->flush();
 
             $json['alertClass'] = 'success';
-            $json['alertMessage'] = $this->get('translator')->trans('Success ! Prepared response removed successfully.');
+            $json['alertMessage'] = $this->translator->trans('Success ! Prepared response removed successfully.');
         }
 
         $response = new Response(json_encode($json));
@@ -61,7 +74,7 @@ class PreparedResponseXHR extends Controller
 
     public function getPreparedResponseActionOptionsXHR($entity, Request $request)
     {
-        foreach ($this->get('uvdesk.automations.prepared_responses')->getRegisteredPreparedResponseActions() as $preparedResponseAction) {
+        foreach ($this->preparedResponseListner->getRegisteredPreparedResponseActions() as $preparedResponseAction) {
             if ($preparedResponseAction->getId() == $entity) {
                 $options = $preparedResponseAction->getOptions($this->container);
 

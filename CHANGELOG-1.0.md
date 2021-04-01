@@ -3,6 +3,12 @@ CHANGELOG for 1.0.x
 
 This changelog references any relevant changes introduced in 1.0 minor versions.
 
+* 1.0.8 (2021-04-01)
+    * **Issue #33:** exception when view the automation bundle packages.
+    * **Issue #34:** Actions on ticket status change or deletion not working.
+    * **Issue #36:** some updates required on previously added workflow.
+    * Controller updates as per symfony version 4.3.
+
 * 1.0.7 (2020-05-26)
     * **Issue #32:** Getting exception when workflow contains description condition while ticket create.
 

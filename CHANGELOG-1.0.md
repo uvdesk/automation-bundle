@@ -3,6 +3,10 @@ CHANGELOG for 1.0.x
 
 This changelog references any relevant changes introduced in 1.0 minor versions.
 
+* 1.0.9 (2021-08-21)
+    * **Misc. Updates:**
+        * Updated workflow priority translations.
+
 * 1.0.8 (2021-04-01)
     * **Issue #33:** exception when view the automation bundle packages.
     * **Issue #34:** Actions on ticket status change or deletion not working.

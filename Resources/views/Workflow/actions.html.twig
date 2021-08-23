@@ -36,7 +36,28 @@
 </script>
 
 <script type="text/template" id="action-value-select-option">
-	<option value="<%= id %>" <%- (typeof(value) != 'undefined' && (typeof(value) === 'object' && value.indexOf(id.toString()) > -1)) ? 'selected' : (typeof(value) != 'undefined' && value == id ? 'selected' : '')%>><%= name %></option>
+	<option value="<%= id %>" <%- (typeof(value) != 'undefined' && (typeof(value) === 'object' && value.indexOf(id.toString()) > -1)) ? 'selected' : (typeof(value) != 'undefined' && value == id ? 'selected' : '')%>>
+	<% if (name == "Low") { %>
+		{{ "Low"|trans }}
+	<% } else if (name == "Medium") { %>
+		{{ "Medium"|trans }}
+	<%} else if (name == "High") { %>
+		{{ "High"|trans }}
+	<% } else if (name == "Urgent") { %>
+		{{ "Urgent"|trans }}
+	<% } else if (name == "Open") { %>
+		{{ "Open"|trans}}
+	<% } else if (name == "Pending") { %>
+		{{"Pending"|trans}}
+	<%} else if (name == "Answered") { %>
+	 	{{ "Answered"|trans}}
+	<% } else if (name == "Closed") { %>
+		{{ "Closed"|trans}}
+	<%} else if (name == "Resolved") { %>
+		{{ "Resolved"|trans }}
+	<% } else { %>
+		<%= name %>
+	<% } %></option>
 </script>
 
 <script type="text/template" id="action-value-select-for-option">
@@ -59,12 +80,9 @@
 		forEditor = false;
 		forSubject = true;
 	});
-
 	var sB = sB || {};
-
 	sB.actionRow = 0;
 	sB.JsonActions = JSON.parse("{{ uvdesk_automations.getWorkflowActions(forcedActions is defined and forcedActions ? true : false) | json_encode | e('js') }}");
-
 	sB.ActionCollection = Backbone.Collection.extend({
 	    baseUrl: "{{ path('helpdesk_member_workflow_action_options_xhr') }}",
 		fetchResult: function(dataMatch, currentEvent) {
@@ -73,7 +91,6 @@
 			return this.fetch();
 		},
 	});
-
 	sB.ActionSelectView = Backbone.View.extend({
 		tagName: 'div',
 		className: 'uv-field-block workflow-action',
@@ -108,17 +125,14 @@
 			if (this.disable) {
 				return;
 			}
-
 			var value = this.value = e.target.value;
 			if (typeof(sB.actionselectView) != 'undefined') {
 				sB.actionselectView.removeduplicate(e);
 			}
-
 			this.selectOpt = this.$el.find('.wfAction');
 			this.siblingValue = this.$el.find('.apply-action');
 			// if(value == 'delete_ticket' || value == 'mark_spam')
 			this.siblingValue.find('select, textarea, div').remove();
-
 			if (value == 'uvdesk.agent.add_note' || value == 'reply') {
 				this.siblingValue.prepend(this.valueTextTemplate(_.extend(this.model, {'keyNo': this.keyNo})));
 			} else if (value != 'uvdesk.ticket.delete' && value != 'uvdesk.ticket.mark_spam' && value) {
@@ -131,7 +145,6 @@
 				} else {
 					this.siblingValue.prepend(this.valueSelectTemplate(_.extend(this.model, {'keyNo': this.keyNo})));
 				}
-
 				var self = this;
 				sB.actionCollection.fetchResult(value, this.getCurrentEvent())
 					.done(function() {
@@ -171,7 +184,6 @@
 			}, this);
 		}
 	});
-
 	sB.ActionSelectViews = Backbone.View.extend({
 		el: '.uv-view',
 		target: $('#actions .workflow-action-body'),
@@ -224,7 +236,6 @@
 	 		this.target.find('tr').eq(0).find('span.border-override').remove();
 		},
 	});
-
 	sB.actionCollection = new sB.ActionCollection();
 	sB.actionselectView = new sB.ActionSelectViews();
 </script>

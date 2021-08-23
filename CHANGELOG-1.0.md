@@ -3,6 +3,10 @@ CHANGELOG for 1.0.x
 
 This changelog references any relevant changes introduced in 1.0 minor versions.
 
+* 1.0.10 (2021-08-23)
+    * **Misc. Updates:**
+        * Updated workflow priority translations.
+
 * 1.0.9 (2021-08-21)
     * **Misc. Updates:**
         * Updated workflow priority translations.

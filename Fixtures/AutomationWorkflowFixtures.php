@@ -71,6 +71,40 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'status' => '1',
             'sort_order' => '6',
             'events' => ['uvdesk.ticket.customer_reply']
+        ],        [
+            'name' => 'Collaborator Replied on Ticket',
+            'description' => 'Send agent & customer an email when reply is added on ticket.',
+            'conditions' => 'N;',
+            'actions' => 'a:2:{i:0;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:1:{i:0;s:18:"responsePerforming";}s:5:"value";s:1:"7";}}i:1;a:2:{s:4:"type";s:27:"uvdesk.ticket.mail_customer";s:5:"value";s:1:"7";}}',
+            'status' => '1',
+            'sort_order' => '7',
+            'events' => ['uvdesk.ticket.collaborator_reply']
+        ],
+        [
+            'name' => 'Collaborator Added to ticket',
+            'description' => 'Send collaborator a welcome email after their account has been Added.',
+            'conditions' => 'N;',
+            'actions' => 'a:1:{i:0;a:2:{s:4:"type";s:36:"uvdesk.ticket.mail_last_collaborator";s:5:"value";s:1:"6";}}',
+            'status' => '1',
+            'sort_order' => '8',
+            'events' => ['uvdesk.ticket.collaborator_updated']
+        ],        [
+            'name' => 'Collaborator Replied on Ticket',
+            'description' => 'Send agent & customer an email when reply is added on ticket.',
+            'conditions' => 'N;',
+            'actions' => 'a:2:{i:0;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:1:{i:0;s:18:"responsePerforming";}s:5:"value";s:1:"7";}}i:1;a:2:{s:4:"type";s:27:"uvdesk.ticket.mail_customer";s:5:"value";s:1:"7";}}',
+            'status' => '1',
+            'sort_order' => '7',
+            'events' => ['uvdesk.ticket.collaborator_reply']
+        ],
+        [
+            'name' => 'Collaborator Account Added',
+            'description' => 'Send collaborator a welcome email after their account has been created.',
+            'conditions' => 'N;',
+            'actions' => 'a:1:{i:0;a:2:{s:4:"type";s:36:"uvdesk.ticket.mail_last_collaborator";s:5:"value";s:1:"6";}}',
+            'status' => '1',
+            'sort_order' => '8',
+            'events' => ['uvdesk.ticket.collaborator_updated']
         ],
     ];
 

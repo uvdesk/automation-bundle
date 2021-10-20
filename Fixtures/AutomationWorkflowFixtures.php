@@ -76,7 +76,7 @@ class AutomationWorkflowFixtures extends DoctrineFixture
             'name' => 'Collaborator Replied on Ticket',
             'description' => 'Send agent & customer an email when reply is added on ticket.',
             'conditions' => 'N;',
-            'actions' => 'a:2:{i:0;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:1:{i:0;s:18:"responsePerforming";}s:5:"value";s:2:"10";}}i:1;a:2:{s:4:"type";s:27:"uvdesk.ticket.mail_customer";s:5:"value";s:2:"10";}}',
+            'actions' => 'a:3:{i:0;a:2:{s:4:"type";s:26:"uvdesk.ticket.assign_agent";s:5:"value";s:18:"responsePerforming";}i:1;a:2:{s:4:"type";s:24:"uvdesk.ticket.mail_agent";s:5:"value";a:2:{s:3:"for";a:1:{i:0;s:13:"assignedAgent";}s:5:"value";s:2:"10";}}i:2;a:2:{s:4:"type";s:27:"uvdesk.ticket.mail_customer";s:5:"value";s:2:"11";}}',
             'status' => '1',
             'sort_order' => '7',
             'events' => ['uvdesk.ticket.collaborator_reply']

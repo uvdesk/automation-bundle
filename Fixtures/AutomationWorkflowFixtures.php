@@ -2,7 +2,7 @@
 
 namespace Webkul\UVDesk\AutomationBundle\Fixtures;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture as DoctrineFixture;
 use Webkul\UVDesk\AutomationBundle\Entity as AutomationEntities;
 

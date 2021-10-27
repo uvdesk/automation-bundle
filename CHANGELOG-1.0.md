@@ -3,6 +3,11 @@ CHANGELOG for 1.0.x
 
 This changelog references any relevant changes introduced in 1.0 minor versions.
 
+* 1.0.11 (2021-10-27)
+    * **Misc. Updates:**
+        * Compatibility with PHP 8.
+        * New Default workflows added for collaborator.
+
 * 1.0.10 (2021-08-23)
     * **Misc. Updates:**
         * Updated workflow priority translations.

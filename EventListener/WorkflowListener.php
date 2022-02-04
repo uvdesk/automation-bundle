@@ -17,7 +17,7 @@ class WorkflowListener
     private $registeredWorkflowEvents = [];
     private $registeredWorkflowActions = [];
 
-    public function __construct(ContainerInterface $container, EntityManager $entityManager)
+    public function __construct(ContainerInterface $container, EntityManagerInterface $entityManager)
     {
         $this->container = $container;
         $this->entityManager = $entityManager;

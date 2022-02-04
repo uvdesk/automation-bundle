@@ -2,7 +2,7 @@
 
 namespace Webkul\UVDesk\AutomationBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Webkul\UVDesk\AutomationBundle\Entity\PreparedResponses;
 use Symfony\Component\DependencyInjection\ContainerInterface;

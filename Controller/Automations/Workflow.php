@@ -9,7 +9,7 @@ use Webkul\UVDesk\AutomationBundle\Form\DefaultForm;
 use Webkul\UVDesk\AutomationBundle\Entity;
 use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
 use Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Workflow extends AbstractController
 {

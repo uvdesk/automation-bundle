@@ -4,13 +4,13 @@ namespace Webkul\UVDesk\AutomationBundle\Controller\Automations;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
 use Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Webkul\UVDesk\CoreFrameworkBundle\Services\TicketService;
 
-class WorkflowXHR extends Controller
+class WorkflowXHR extends AbstractController
 {
     private $userService;
     private $translator;

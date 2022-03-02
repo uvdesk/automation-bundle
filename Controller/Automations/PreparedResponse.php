@@ -12,6 +12,7 @@ use Webkul\UVDesk\AutomationBundle\Entity;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PreparedResponse extends AbstractController
 {
@@ -186,7 +187,7 @@ class PreparedResponse extends AbstractController
     }
 
 
-    public function editPrepareResponse(Request $request)
+    public function editPrepareResponse(Request $request, ContainerInterface $container)
     {
         if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
@@ -197,7 +198,7 @@ class PreparedResponse extends AbstractController
         
         if ($request->attributes->get('id')) {
 
-            $workflow = $entityManager->getRepository('UVDeskAutomationBundle:PreparedResponses')->getPreparedResponse($request->attributes->get('id'), $this->container);
+            $workflow = $entityManager->getRepository('UVDeskAutomationBundle:PreparedResponses')->getPreparedResponse($request->attributes->get('id'), $container);
 
             if (!empty($workflow)) {
                 $formData = [

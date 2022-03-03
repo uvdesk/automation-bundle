@@ -9,6 +9,7 @@ use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
 use Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Webkul\UVDesk\CoreFrameworkBundle\Services\TicketService;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class WorkflowXHR extends AbstractController
 {
@@ -25,7 +26,7 @@ class WorkflowXHR extends AbstractController
         $this->translator = $translator;
     }
 
-    public function workflowsListXhr(Request $request)
+    public function workflowsListXhr(Request $request, ContainerInterface $container)
     {
         if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
@@ -33,7 +34,7 @@ class WorkflowXHR extends AbstractController
 
         $json = [];
         $repository = $this->getDoctrine()->getRepository('UVDeskAutomationBundle:Workflow');
-        $json = $repository->getWorkflows($request->query, $this->container);
+        $json = $repository->getWorkflows($request->query, $container);
 
         $response = new Response(json_encode($json));
         $response->headers->set('Content-Type', 'application/json');
@@ -188,11 +189,11 @@ class WorkflowXHR extends AbstractController
         return new Response(is_array($json) ? json_encode($json) : $json, 200, ['Content-Type' => 'application/json']);
     }
 
-    public function getWorkflowActionOptionsXHR($entity, Request $request)
+    public function getWorkflowActionOptionsXHR($entity, Request $request, ContainerInterface $container)
     {
         foreach ($this->workflowListnerService->getRegisteredWorkflowActions() as $workflowAction) {
             if ($workflowAction->getId() == $entity) {
-                $options = $workflowAction->getOptions($this->container);
+                $options = $workflowAction->getOptions($container);
                 
                 if (!empty($options)) {
                     return new Response(json_encode($options), 200, ['Content-Type' => 'application/json']);

@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Webkul\UVDesk\AutomationBundle\EventListener\PreparedResponseListener;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PreparedResponseXHR extends AbstractController
 {
@@ -34,7 +35,7 @@ class PreparedResponseXHR extends AbstractController
         $this->preparedResponseListner = $preparedResponseListner;
     }
 
-    public function prepareResponseListXhr(Request $request)
+    public function prepareResponseListXhr(Request $request, ContainerInterface $container)
     {
         if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {          
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
@@ -42,7 +43,7 @@ class PreparedResponseXHR extends AbstractController
 
         $json = [];
         $repository = $this->getDoctrine()->getRepository('UVDeskAutomationBundle:PreparedResponses');
-        $json = $repository->getPreparesResponses($request->query, $this->container);
+        $json = $repository->getPreparesResponses($request->query, $container);
         $response = new Response(json_encode($json));
         $response->headers->set('Content-Type', 'application/json');
         return $response;
@@ -72,11 +73,11 @@ class PreparedResponseXHR extends AbstractController
         return $response;
     }
 
-    public function getPreparedResponseActionOptionsXHR($entity, Request $request)
+    public function getPreparedResponseActionOptionsXHR($entity, Request $request, ContainerInterface $container)
     {
         foreach ($this->preparedResponseListner->getRegisteredPreparedResponseActions() as $preparedResponseAction) {
             if ($preparedResponseAction->getId() == $entity) {
-                $options = $preparedResponseAction->getOptions($this->container);
+                $options = $preparedResponseAction->getOptions($container);
 
                 if (!empty($options)) {
                     return new Response(json_encode($options), 200, ['Content-Type' => 'application/json']);

@@ -5,11 +5,12 @@ namespace Webkul\UVDesk\AutomationBundle\Controller\Automations;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
-use Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Webkul\UVDesk\CoreFrameworkBundle\Services\TicketService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
+use Webkul\UVDesk\AutomationBundle\Entity;
+use Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\TicketService;
 
 class WorkflowXHR extends AbstractController
 {
@@ -33,7 +34,7 @@ class WorkflowXHR extends AbstractController
         }
 
         $json = [];
-        $repository = $this->getDoctrine()->getRepository('UVDeskAutomationBundle:Workflow');
+        $repository = $this->getDoctrine()->getRepository(Entity\Workflow::class);
         $json = $repository->getWorkflows($request->query, $container);
 
         $response = new Response(json_encode($json));
@@ -53,7 +54,7 @@ class WorkflowXHR extends AbstractController
             if($request->getMethod() == 'POST'){
                 $em = $this->getDoctrine()->getManager();
                 //sort order update
-                $workflows = $em->getRepository("UVDeskAutomationBundle:Workflow")->findAll();
+                $workflows = $em->getRepository(Entity\Workflow::class)->findAll();
                    
                 $sortOrders = $request->request->get('orders');
                 if(count($workflows)) {
@@ -79,7 +80,7 @@ class WorkflowXHR extends AbstractController
                 $em = $this->getDoctrine()->getManager();
                 $id = $request->attributes->get('id');
                 //$workFlow = $this->getWorkflow($id, 'Events');
-                $workFlow = $em->getRepository("UVDeskAutomationBundle:Workflow")
+                $workFlow = $em->getRepository(Entity\Workflow::class)
                             ->findOneBy(array('id' => $id));
 
                 if (!empty($workFlow)) {

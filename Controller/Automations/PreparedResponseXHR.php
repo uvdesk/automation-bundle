@@ -42,7 +42,7 @@ class PreparedResponseXHR extends AbstractController
         }
 
         $json = [];
-        $repository = $this->getDoctrine()->getRepository('UVDeskAutomationBundle:PreparedResponses');
+        $repository = $this->getDoctrine()->getRepository(Entity\PreparedResponses::class);
         $json = $repository->getPreparesResponses($request->query, $container);
         $response = new Response(json_encode($json));
         $response->headers->set('Content-Type', 'application/json');
@@ -59,7 +59,7 @@ class PreparedResponseXHR extends AbstractController
         if($request->getMethod() == "DELETE") {
             $em = $this->getDoctrine()->getManager();
             $id = $request->attributes->get('id');
-            $preparedResponses = $em->getRepository('UVDeskAutomationBundle:PreparedResponses')->find($id);
+            $preparedResponses = $em->getRepository(Entity\PreparedResponses::class)->find($id);
 
             $em->remove($preparedResponses);
             $em->flush();

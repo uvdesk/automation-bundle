@@ -3,6 +3,7 @@
 namespace Webkul\UVDesk\AutomationBundle\Repository;
 
 use Doctrine\Common\Collections\Criteria;
+use Webkul\UVDesk\AutomationBundle\Entity\Workflow;
 
 /**
  * WorkflowRepository
@@ -19,7 +20,7 @@ class WorkflowRepository extends \Doctrine\ORM\EntityRepository
     {
         return $this->getEntityManager()->createQueryBuilder()
             ->select('workflow')
-            ->from('UVDeskAutomationBundle:Workflow', 'workflow')
+            ->from(Workflow::class, 'workflow')
             ->leftJoin('workflow.workflowEvents', 'workflowEvents')
             ->where('workflow.status = :status')->setParameter('status', $isActive)
             ->andWhere('workflow.isPredefind = :isPredefined')->setParameter('isPredefined', $isPredefined)

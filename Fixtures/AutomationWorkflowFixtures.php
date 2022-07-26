@@ -94,7 +94,7 @@ class AutomationWorkflowFixtures extends DoctrineFixture
 
     public function load(ObjectManager $entityManager)
     {
-        $availableWorkflows = $entityManager->getRepository('UVDeskAutomationBundle:Workflow')->findAll();
+        $availableWorkflows = $entityManager->getRepository(AutomationEntities\Workflow::class)->findAll();
 
         if (empty($availableWorkflows)) {
             foreach (self::$seeds as $baseEvent) {

@@ -198,7 +198,7 @@ class PreparedResponse extends AbstractController
         
         if ($request->attributes->get('id')) {
 
-            $workflow = $entityManager->getRepository('UVDeskAutomationBundle:PreparedResponses')->getPreparedResponse($request->attributes->get('id'), $container);
+            $workflow = $entityManager->getRepository(Entity\PreparedResponses::class)->getPreparedResponse($request->attributes->get('id'), $container);
 
             if (!empty($workflow)) {
                 $formData = [

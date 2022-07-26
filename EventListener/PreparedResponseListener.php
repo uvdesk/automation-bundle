@@ -33,7 +33,7 @@ class PreparedResponseListener
 
     public function executePreparedResponse(GenericEvent $event)
     {
-        $preparedResponse = $this->entityManager->getRepository('UVDeskAutomationBundle:PreparedResponses')->getPreparedResponse($event->getSubject());
+        $preparedResponse = $this->entityManager->getRepository(PreparedResponses::class)->getPreparedResponse($event->getSubject());
         
         if (!empty($preparedResponse)) {
             $this->applyPreparedResponseActions($preparedResponse , $event->getArgument('entity'));

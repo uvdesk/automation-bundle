@@ -188,7 +188,7 @@ class Workflow extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
 
         if ($request->attributes->get('id')) {
-            $workflow = $entityManager->getRepository('UVDeskAutomationBundle:Workflow')->findOneById($request->attributes->get('id'));
+            $workflow = $entityManager->getRepository(Entity\Workflow::class)->findOneById($request->attributes->get('id'));
 
             if (!empty($workflow)) {
                 $formData = [

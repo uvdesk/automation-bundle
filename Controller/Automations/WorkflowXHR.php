@@ -174,7 +174,7 @@ class WorkflowXHR extends AbstractController
                         'id' => $item->getId(),
                         'name' => $item->getCode(),
                     ];
-                }, $this->getDoctrine()->getRepository('UVDeskCoreFrameworkBundle:' . ucfirst($entity))->findAll()));
+                }, $this->getDoctrine()->getRepository("Webkul\\UVDesk\\CoreFrameworkBundle\\" . ucfirst($entity))->findAll()));
 
                 break;
             default:

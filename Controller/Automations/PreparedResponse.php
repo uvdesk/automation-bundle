@@ -7,12 +7,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Webkul\UVDesk\AutomationBundle\Form\DefaultForm;
-use Webkul\UVDesk\AutomationBundle\Entity;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Webkul\UVDesk\AutomationBundle\Entity;
+use Webkul\UVDesk\AutomationBundle\Form\DefaultForm;
+use Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportGroup;
+use Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportTeam;;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
 
 class PreparedResponse extends AbstractController
 {
@@ -111,7 +113,7 @@ class PreparedResponse extends AbstractController
                     }
                     foreach($groups as $key => $groupId) {
                         if($groupId) {
-                            $group = $em->getRepository('UVDeskCoreFrameworkBundle:SupportGroup')->findOneBy([ 'id' => $groupId]);
+                            $group = $em->getRepository(SupportGroup::class)->findOneBy([ 'id' => $groupId]);
                             if($group && (empty($previousGroupIds) || !in_array($groupId, $previousGroupIds)) ) {
                                 $newWorkflow->addGroup($group);
                                 $em->persist($newWorkflow);
@@ -133,7 +135,7 @@ class PreparedResponse extends AbstractController
                     }
                     foreach($teams as $key => $teamId) {
                         if($teamId) {
-                            $team = $em->getRepository('UVDeskCoreFrameworkBundle:SupportTeam')->findOneBy([ 'id' => $teamId]);
+                            $team = $em->getRepository(SupportTeam::class)->findOneBy([ 'id' => $teamId]);
                             if($team && (empty($previousTeamIds) || !in_array($teamId, $previousTeamIds)) ) {
                                 $newWorkflow->addTeam($team);
                                 $em->persist($newWorkflow);
@@ -281,7 +283,7 @@ class PreparedResponse extends AbstractController
                     }
                     foreach($groups as $key => $groupId) {
                         if($groupId) {
-                            $group = $em->getRepository('UVDeskCoreFrameworkBundle:SupportGroup')->findOneBy([ 'id' => $groupId]);
+                            $group = $em->getRepository(SupportGroup::class)->findOneBy([ 'id' => $groupId]);
                             if($group && (empty($previousGroupIds) || !in_array($groupId, $previousGroupIds)) ) {
                                 $newWorkflow->addGroup($group);
                                 $em->persist($newWorkflow);
@@ -303,7 +305,7 @@ class PreparedResponse extends AbstractController
                     }
                     foreach($teams as $key => $teamId) {
                         if($teamId) {
-                            $team = $em->getRepository('UVDeskCoreFrameworkBundle:SupportTeam')->findOneBy([ 'id' => $teamId]);
+                            $team = $em->getRepository(SupportTeam::class)->findOneBy([ 'id' => $teamId]);
                             if($team && (empty($previousTeamIds) || !in_array($teamId, $previousTeamIds)) ) {
                                 $newWorkflow->addTeam($team);
                                 $em->persist($newWorkflow);

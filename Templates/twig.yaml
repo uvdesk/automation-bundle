@@ -1,3 +1,0 @@
-twig:
-    globals:
-        uvdesk_automations: "@uvdesk.automations"

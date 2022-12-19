@@ -67,11 +67,7 @@ class PreparedResponse extends AbstractController
             $workflowActionsArray = $request->request->get('actions');
 
             if (!trim($formData->get('name')) || (strlen($formData->get('name')) > self::NAME_LENGTH)) {
-                $error['name'] = $this->translate('Warning! Please add valid Name! Length must not be greater than %length%', ['%length%' => self::NAME_LENGTH]);
-            }
-
-            if (strlen($formData->get('description')) > self::DESCRIPTION_LENGTH) {
-                $error['description'] = $this->translate('Warning! Please add valid Description! Length must not be greater than %desc%', ['%desc%' => self::DESCRIPTION_LENGTH]);
+                $error['name'] = $this->translator->trans('Warning! Please add valid Name! Length must not be greater than %length%', ['%length%' => self::NAME_LENGTH]);
             }
 
             if (!empty($workflowActionsArray)) {
@@ -83,7 +79,7 @@ class PreparedResponse extends AbstractController
             }
 
             if (empty($workflowActionsArray)) {
-                $error['actions'] = $this->translate('Warning! Please add valid Actions!');
+                $error['actions'] = $this->translator->trans('Warning! Please add valid Actions!');
             }
 
             if (empty($error)) {
@@ -233,11 +229,7 @@ class PreparedResponse extends AbstractController
             $workflowActionsArray = $request->request->get('actions');
 
             if (!trim($formData->get('name')) || (strlen($formData->get('name')) > self::NAME_LENGTH)) {
-                $error['name'] = $this->translate('Warning! Please add valid Name! Length must not be greater than %length%', ['%length%' => self::NAME_LENGTH]);
-            }
-
-            if (strlen($formData->get('description')) > self::DESCRIPTION_LENGTH) {
-                $error['description'] = $this->translate('Warning! Please add valid Description! Length must not be greater than %desc%', ['%desc%' => self::DESCRIPTION_LENGTH]);
+                $error['name'] = $this->translator->trans('Warning! Please add valid Name! Length must not be greater than %length%', ['%length%' => self::NAME_LENGTH]);
             }
 
             if (!empty($workflowActionsArray)) {
@@ -249,11 +241,11 @@ class PreparedResponse extends AbstractController
             }
 
             if (empty($workflowActionsArray)) {
-                $error['actions'] = $this->translate('Warning! Please add valid Actions!');
+                $error['actions'] = $this->translator->trans('Warning! Please add valid Actions!');
             }
 
             if ($workflowEventType && array_values($workflowEventsArray)[0]['event'] != $workflowEventType) {
-                $error['events'] = $this->translate('Warning! In Free Plan you can not change Events!');
+                $error['events'] = $this->translator->trans('Warning! In Free Plan you can not change Events!');
             }
 
             if (empty($error)) {

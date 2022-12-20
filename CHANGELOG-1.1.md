@@ -4,6 +4,7 @@ CHANGELOG for 1.1.x
 This changelog references any relevant changes introduced in 1.1 minor versions.
 
 * 1.1.x
+    * Update: Change entity PreparedResponse::description param to type text from string
     * Bug #50: Error loading ticket status and priority options in workflow conditions (Komal-sharma-2712)
 
 * 1.1.1 (2022-09-13)

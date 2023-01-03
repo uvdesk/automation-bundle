@@ -104,7 +104,7 @@
 			var objKey = ((typeof(sB.PrevEvent) != 'undefined' && sB.PrevEvent) ? sB.PrevEvent : 'ticket');
 			this.$el.html(this.selectTemplate(_.extend(this.model, {'keyNo': this.keyNo, 'conditions': sB.JsonConditions[objKey]})));
 
-			if (objKey == 'ticket' || objKey == 'task') {
+			if (objKey == 'ticket' || objKey == 'task' || objKey == 'email') {
 				$('#conditions').prev('.uv-hr').fadeIn(10);
 				$('#conditions').fadeIn(10);
 			} else {

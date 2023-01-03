@@ -3,12 +3,13 @@
 namespace Webkul\UVDesk\AutomationBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Webkul\UVDesk\AutomationBundle\Entity\Workflow;
-use Webkul\UVDesk\CoreFrameworkBundle\Entity\Ticket;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Webkul\UVDesk\AutomationBundle\Workflow\Event as WorkflowEvent;
 use Webkul\UVDesk\AutomationBundle\Workflow\Action as WorkflowAction;
+use Webkul\UVDesk\CoreFrameworkBundle\Entity\Ticket;
+use Webkul\UVDesk\AutomationBundle\Workflow\FunctionalGroup;
 
 class WorkflowListener
 {
@@ -71,9 +72,9 @@ class WorkflowListener
         return $this->registeredWorkflowActions;
     }
 
-    public function executeWorkflow(GenericEvent $event)
+    public function executeWorkflow(WorkflowEvent $event)
     {
-        $workflowCollection = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows($event->getSubject());
+        $workflowCollection = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows($event::getId());
 
         /*
             @NOTICE: Events 'uvdesk.agent.forgot_password', 'uvdesk.customer.forgot_password' will be deprecated 
@@ -85,7 +86,7 @@ class WorkflowListener
             configured to work on either of the two deprecated events, we will need to make an educated guess 
             which one to use (if any) if there's none found for the actual event.
         */
-        if (empty($workflowCollection) && 'uvdesk.user.forgot_password' == $event->getSubject()) {
+        if (empty($workflowCollection) && 'uvdesk.user.forgot_password' == $event::getId()) {
             $user = $event->getArgument('entity');
 
             if (!empty($user) && $user instanceof \Webkul\UVDesk\CoreFrameworkBundle\Entity\User) {
@@ -115,21 +116,35 @@ class WorkflowListener
                 foreach ($this->evaluateWorkflowConditions($workflow) as $workflowCondition) {
                     $totalEvaluatedConditions++;
 
-                    if (isset($workflowCondition['type']) && $this->checkCondition($workflowCondition, $event->getArgument('entity'))) {
-                        $totalConditions++;
-                    }
-
-                    if (isset($workflowCondition['or'])) {
-                        foreach ($workflowCondition['or'] as $orCondition) {
-                            if ($this->checkCondition($orCondition, $event->getArgument('entity'))) {
-                                $totalConditions++;
+                    if ($event::getFunctionalGroup() == FunctionalGroup::EMAIL) {
+                        if (isset($workflowCondition['type']) && $this->checkCondition($workflowCondition, $event->getResolvedEmailHeaders())) {
+                            $totalConditions++;
+                        }
+                        
+                        if (isset($workflowCondition['or'])) {
+                            foreach ($workflowCondition['or'] as $orCondition) {
+                                if ($this->checkCondition($orCondition, $event->getResolvedEmailHeaders())) {
+                                    $totalConditions++;
+                                }
+                            }
+                        }
+                    } else {
+                        if (isset($workflowCondition['type']) && $this->checkCondition($workflowCondition, $event->getArgument('entity'))) {
+                            $totalConditions++;
+                        }
+                        
+                        if (isset($workflowCondition['or'])) {
+                            foreach ($workflowCondition['or'] as $orCondition) {
+                                if ($this->checkCondition($orCondition, $event->getArgument('entity'))) {
+                                    $totalConditions++;
+                                }
                             }
                         }
                     }
                 }
 
                 if ($totalEvaluatedConditions == 0 || $totalConditions >= $totalEvaluatedConditions) {
-                    $this->applyWorkflowActions($workflow, $event->getArgument('entity'), $event->hasArgument('thread') ? $event->getArgument('thread') : null);
+                    $this->applyWorkflowActions($workflow, $event);
                 }
             }
         }
@@ -160,7 +175,7 @@ class WorkflowListener
         return $workflowConditions;
     }
 
-    private function applyWorkflowActions(Workflow $workflow, $entity, $thread = null)
+    private function applyWorkflowActions(Workflow $workflow, WorkflowEvent $event)
     {
         foreach ($workflow->getActions() as $attributes) {
             if (empty($attributes['type'])) {
@@ -169,7 +184,7 @@ class WorkflowListener
 
             foreach ($this->getRegisteredWorkflowActions() as $workflowAction) {
                 if ($workflowAction->getId() == $attributes['type']) {
-                    $workflowAction->applyAction($this->container, $entity, isset($attributes['value']) ? $attributes['value'] : '', $thread);
+                    $workflowAction->applyAction($this->container, $event, isset($attributes['value']) ? $attributes['value'] : '');
                 }
             }
         }
@@ -179,8 +194,12 @@ class WorkflowListener
     {
         switch ($condition['type']) {
             case 'from_mail':
-                if (isset($condition['value']) && $entity instanceof Ticket) {
-                    return $this->match($condition['match'], $entity->getCustomer()->getEmail(), $condition['value']);
+                if (isset($condition['value'])) {
+                    if ($entity instanceof Ticket) {
+                        return $this->match($condition['match'], $entity->getCustomer()->getEmail(), $condition['value']);
+                    } else if (is_array($entity) && !empty($entity['from'])) {
+                        return $this->match($condition['match'], $entity['from'], $condition['value']);
+                    }
                 }
 
                 break;

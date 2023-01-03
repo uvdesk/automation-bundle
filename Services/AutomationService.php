@@ -31,6 +31,7 @@ class AutomationService
             FunctionalGroup::AGENT => $this->translator->trans('Agent'),
             FunctionalGroup::CUSTOMER => $this->translator->trans('Customer'),
             FunctionalGroup::TICKET => $this->translator->trans('Ticket'),
+            FunctionalGroup::EMAIL => $this->translator->trans('Email'),
         ];
     }
 
@@ -133,6 +134,15 @@ class AutomationService
                     [
                         'lable' => $this->translator->trans('Customer Email'),
                         'value' => 'customer_email',
+                        'match' => 'email'
+                    ],
+                ],
+            ], 
+            'email' => [
+                'mail' => [
+                    [
+                        'lable' => $this->translator->trans('From Email'),
+                        'value' => 'from_mail',
                         'match' => 'email'
                     ],
                 ],

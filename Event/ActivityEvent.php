@@ -3,11 +3,14 @@
 namespace Webkul\UVDesk\AutomationBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
+// @TODO: Refactor this code
 class ActivityEvent extends Event
 {
-    private $eventName;
     private $entity;
+    private $eventName;
+
     private $container;
     private $user;
     private $targetEntity;
@@ -16,27 +19,32 @@ class ActivityEvent extends Event
     private $subject;
     private $socialMedium;
 
-    public function __construct($container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
-    public function setParameters($params) {
+    public function setParameters($params)
+    {
+        $this->entity = $params['entity'];
         $this->eventName = $params['event'];
         $this->userType = isset($params['userType']) ? $params['userType'] : 'agent';
-        $this->entity = $params['entity'];
 
-        if(isset($params['notePlaceholders']))
+        if (isset($params['notePlaceholders'])) {
             $this->notePlaceholders = $params['notePlaceholders'];
+        }
 
-        if(isset($params['targetEntity']))
+        if (isset($params['targetEntity'])) {
             $this->targetEntity = $params['targetEntity'];
+        }
 
-        if(isset($params['user']))
+        if (isset($params['user'])) {
             $this->user = $params['user'];
+        }
 
-        if(isset($params['subject']) && $params['subject'] != '')
+        if (isset($params['subject']) && $params['subject'] != '') {
             $this->subject = $params['subject'];
+        }
 
         $this->socialMedium = isset($params['socialMedium']) ? $params['socialMedium'] : false;
     }
@@ -74,11 +82,8 @@ class ActivityEvent extends Event
     public function getCurrentUser()
     {
         $user = $this->container->get('user.service')->getSessionUser();
-        if ($user)
-            return $user;
-        else {
-            return $this->user;
-        }
+
+        return !empty($user) ? $user : $this->user;
     }
 
     public function getSubject()

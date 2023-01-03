@@ -40,7 +40,7 @@ class WorkflowListener
             if ($workflowDefinition->getId() == $eventId) {
                 /*
                     @NOTICE: Events 'uvdesk.agent.forgot_password', 'uvdesk.customer.forgot_password' will be deprecated 
-                    onwards uvdesk/automation-bundle:1.0.2 and uvdesk/core-framework:1.0.3 releases and will be 
+                    onwards uvdesk/automation-bundle:1.1.2 and uvdesk/core-framework:1.1.3 releases and will be 
                     completely removed with the next major release.
 
                     Both the events have been mapped to return the 'uvdesk.user.forgot_password' id, so we need to 
@@ -78,10 +78,10 @@ class WorkflowListener
 
         /*
             @NOTICE: Events 'uvdesk.agent.forgot_password', 'uvdesk.customer.forgot_password' will be deprecated 
-            onwards uvdesk/automation-bundle:1.0.2 and uvdesk/core-framework:1.0.3 releases and will be 
+            onwards uvdesk/automation-bundle:1.1.2 and uvdesk/core-framework:1.1.3 releases and will be 
             completely removed with the next major release.
 
-            From uvdesk/core-framework:1.0.3 onwards, instead of the above mentioned events, the one being 
+            From uvdesk/core-framework:1.1.3 onwards, instead of the above mentioned events, the one being 
             triggered will be 'uvdesk.user.forgot_password'. Since there still might be older workflows 
             configured to work on either of the two deprecated events, we will need to make an educated guess 
             which one to use (if any) if there's none found for the actual event.

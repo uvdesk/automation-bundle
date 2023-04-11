@@ -2,14 +2,16 @@
 
 namespace Webkul\UVDesk\AutomationBundle\Controller\Automations;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
 use Webkul\UVDesk\AutomationBundle\Entity;
 use Webkul\UVDesk\AutomationBundle\EventListener\WorkflowListener;
+use Webkul\UVDesk\CoreFrameworkBundle\Entity\TicketStatus;
+use Webkul\UVDesk\CoreFrameworkBundle\Entity\TicketPriority;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
 use Webkul\UVDesk\CoreFrameworkBundle\Services\TicketService;
 
 class WorkflowXHR extends AbstractController
@@ -174,7 +176,7 @@ class WorkflowXHR extends AbstractController
                         'id' => $item->getId(),
                         'name' => $item->getCode(),
                     ];
-                }, $this->getDoctrine()->getRepository("Webkul\\UVDesk\\CoreFrameworkBundle\\Entity\\" . ucfirst($entity))->findAll()));
+                }, $this->getDoctrine()->getRepository($entity == 'TicketStatus' ? TicketStatus::class : TicketPriority::class )->findAll()));
 
                 break;
             default:

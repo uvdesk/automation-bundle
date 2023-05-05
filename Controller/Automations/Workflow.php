@@ -65,6 +65,10 @@ class Workflow extends AbstractController
             $workflowClass = 'Webkul\UVDesk\AutomationBundle\Entity\Workflow';
             $workflowActionsArray = $request->request->get('actions');
 
+            if (strlen($formData->get('name')) > self::NAME_LENGTH) {
+                $error['name'] = $this->translate('Warning! Please add valid Name! Length must not be greater than %name%', ['%name%' => self::NAME_LENGTH]);
+            }
+
             if (strlen($formData->get('description')) > self::DESCRIPTION_LENGTH) {
                 $error['description'] = $this->translate('Warning! Please add valid Description! Length must not be greater than %desc%', ['%desc%' => self::DESCRIPTION_LENGTH]);
             }
@@ -230,6 +234,10 @@ class Workflow extends AbstractController
             
             $workflowClass = 'Webkul\UVDesk\AutomationBundle\Entity\Workflow';
             $workflowActionsArray = $request->request->get('actions');
+
+            if (strlen($formData->get('name')) > self::NAME_LENGTH) {
+                $error['name'] = $this->translate('Warning! Please add valid Name! Length must not be greater than %name%', ['%name%' => self::NAME_LENGTH]);
+            }
 
             if (strlen($formData->get('description')) > self::DESCRIPTION_LENGTH) {
                 $error['description'] = $this->translate('Warning! Please add valid Description! Length must not be greater than %desc%', ['%desc%' => self::DESCRIPTION_LENGTH]);

@@ -4,6 +4,7 @@ CHANGELOG for 1.1.x
 This changelog references any relevant changes introduced in 1.1 minor versions.
 
 * 1.1.x
+    * Update: Dropped dependency on uvdesk/composer-plugin in support of symfony/flex
     * Update: Change entity PreparedResponse::description param to type text from string
     * Bug #50: Error loading ticket status and priority options in workflow conditions (Komal-sharma-2712)
 

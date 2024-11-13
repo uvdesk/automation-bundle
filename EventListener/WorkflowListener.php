@@ -10,18 +10,25 @@ use Webkul\UVDesk\AutomationBundle\Workflow\Event;
 use Webkul\UVDesk\AutomationBundle\Workflow\Events as WorkflowEvents;
 use Webkul\UVDesk\AutomationBundle\Workflow\FunctionalGroup;
 use Webkul\UVDesk\CoreFrameworkBundle\Entity\Ticket;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\TicketService;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
+use UVDesk\CommunityPackages\UVDesk as UVDeskCommunityPackages;
 
 class WorkflowListener
 {
     private $container;
     private $entityManager;
+    private $ticketService;
+    private $userService;
     private $registeredWorkflowEvents = [];
     private $registeredWorkflowActions = [];
 
-    public function __construct(ContainerInterface $container, EntityManagerInterface $entityManager)
+    public function __construct(ContainerInterface $container, EntityManagerInterface $entityManager, TicketService $ticketService, UserService $userService)
     {
         $this->container = $container;
         $this->entityManager = $entityManager;
+        $this->ticketService = $ticketService;
+        $this->userService = $userService;
     }
 
     public function registerWorkflowEvent(Event $serviceTag)
@@ -75,6 +82,26 @@ class WorkflowListener
     public function executeWorkflow(Event $event)
     {
         $workflowCollection = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows($event::getId());
+
+        if ($this->userService->isfileExists('apps/uvdesk/report')) {
+            $reportServiceClass = UVDeskCommunityPackages\Report\Services\ReportService::class;
+            $reportService = new $reportServiceClass($this->entityManager, $this->container, $this->ticketService);
+
+            if (get_class($event) == 'Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events\Ticket\Status') {
+                $ticket = $event->getTicket();
+                $reportService->calculateResolveTime($ticket);
+            } else if (
+                get_class($event) == 'Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events\Ticket\AgentReply'    || 
+                get_class($event) == 'Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events\Ticket\CustomerReply' || 
+                get_class($event) == 'Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events\Ticket\CollaboratorReply'
+            ) {
+                $thread = $event->getThread();
+
+                if ($thread->getThreadType() == 'reply' && ($thread->getcreatedBy() == 'agent' || $thread->getcreatedBy() == 'customer')) {
+                    $reportService->calculateResponseTime($thread);
+                }
+            } 
+        }
 
         /*
             @NOTICE: Events 'uvdesk.agent.forgot_password', 'uvdesk.customer.forgot_password' will be deprecated 

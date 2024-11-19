@@ -85,7 +85,7 @@ class WorkflowListener
 
         if ($this->userService->isfileExists('apps/uvdesk/report')) {
             $reportServiceClass = UVDeskCommunityPackages\Report\Services\ReportService::class;
-            $reportService = new $reportServiceClass($this->entityManager, $this->container, $this->ticketService);
+            $reportService = new $reportServiceClass($this->entityManager, $this->container, $this->ticketService, $this->userService);
 
             if (get_class($event) == 'Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events\Ticket\Status') {
                 $ticket = $event->getTicket();

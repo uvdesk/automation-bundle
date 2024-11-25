@@ -1,12 +1,12 @@
 {
     "name": "uvdesk/automation-bundle",
-    "description": "UVDesk Community Helpdesk Automations Bundle",
+    "description": "UVDesk Community Help desk Automation Bundle",
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
         {
-            "name": "akshay kumar",
-            "email": "akshay.kumar758@webkul.com"
+            "name": "UVdesk Support",
+            "email": "support@uvdesk.com"
         }
     ],
     "require": {

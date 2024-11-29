@@ -13,6 +13,7 @@ use Webkul\UVDesk\CoreFrameworkBundle\Entity\Ticket;
 use Webkul\UVDesk\CoreFrameworkBundle\Services\TicketService;
 use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
 use UVDesk\CommunityPackages\UVDesk as UVDeskCommunityPackages;
+use Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events as CoreWorkflowEvents;
 
 class WorkflowListener
 {
@@ -79,28 +80,36 @@ class WorkflowListener
         return $this->registeredWorkflowActions;
     }
 
-    public function executeWorkflow(Event $event)
+    public function executeWorkflow($event)
     {
+        if (!($event instanceof Event))
+            return;
+
         $workflowCollection = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows($event::getId());
 
         if ($this->userService->isfileExists('apps/uvdesk/report')) {
             $reportServiceClass = UVDeskCommunityPackages\Report\Services\ReportService::class;
             $reportService = new $reportServiceClass($this->entityManager, $this->container, $this->ticketService, $this->userService);
 
-            if (get_class($event) == 'Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events\Ticket\Status') {
-                $ticket = $event->getTicket();
-                $reportService->calculateResolveTime($ticket);
+            if (($event) instanceof CoreWorkflowEvents\Ticket\Status) {
+                $reportService->calculateResolveTime($event->getTicket());
             } else if (
-                get_class($event) == 'Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events\Ticket\AgentReply'    || 
-                get_class($event) == 'Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events\Ticket\CustomerReply' || 
-                get_class($event) == 'Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events\Ticket\CollaboratorReply'
+                ($event) instanceof CoreWorkflowEvents\Ticket\AgentReply    ||
+                ($event) instanceof CoreWorkflowEvents\Ticket\CustomerReply ||
+                ($event) instanceof CoreWorkflowEvents\Ticket\CollaboratorReply
             ) {
                 $thread = $event->getThread();
 
                 if ($thread->getThreadType() == 'reply' && ($thread->getcreatedBy() == 'agent' || $thread->getcreatedBy() == 'customer')) {
                     $reportService->calculateResponseTime($thread);
                 }
-            } 
+            }
+        }
+
+        if (($event) instanceof CoreWorkflowEvents\Ticket\Create && $this->userService->isfileExists('apps/uvdesk/sla')) {
+            $slaServiceClass = UVDeskCommunityPackages\SLA\Services\SlaService::class;
+            $slaService = new $slaServiceClass($this->container, $this->entityManager );
+            $slaService->refreshTicketPolicies($event->getTicket());
         }
 
         /*

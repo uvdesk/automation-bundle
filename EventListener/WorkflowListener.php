@@ -87,7 +87,7 @@ class WorkflowListener
 
         $workflowCollection = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows($event::getId());
 
-        if ($this->userService->isfileExists('apps/uvdesk/report')) {
+        if ($this->userService->isfileExists('apps/uvdesk/report') && !($event instanceof CoreWorkflowEvents\Ticket\Create)) {
             $reportServiceClass = UVDeskCommunityPackages\Report\Services\ReportService::class;
             $reportService = new $reportServiceClass($this->entityManager, $this->container, $this->ticketService, $this->userService);
 

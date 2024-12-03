@@ -80,14 +80,8 @@ class WorkflowListener
         return $this->registeredWorkflowActions;
     }
 
-    public function executeWorkflow($event)
-    {
-        if (!($event instanceof Event))
-            return;
-
-        $workflowCollection = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows($event::getId());
-
-        if ($this->userService->isfileExists('apps/uvdesk/report') && !($event instanceof CoreWorkflowEvents\Ticket\Create)) {
+    public function executeReplyEvent(Event $event) {
+        if ($this->userService->isfileExists('apps/uvdesk/report')) {
             $reportServiceClass = UVDeskCommunityPackages\Report\Services\ReportService::class;
             $reportService = new $reportServiceClass($this->entityManager, $this->container, $this->ticketService, $this->userService);
 
@@ -100,11 +94,19 @@ class WorkflowListener
             ) {
                 $thread = $event->getThread();
 
-                if ($thread->getThreadType() == 'reply' && ($thread->getcreatedBy() == 'agent' || $thread->getcreatedBy() == 'customer')) {
+                if ($thread && $thread->getThreadType() == 'reply' && ($thread->getcreatedBy() == 'agent' || $thread->getcreatedBy() == 'customer')) {
                     $reportService->calculateResponseTime($thread);
                 }
             }
         }
+    }
+
+    public function executeWorkflow($event)
+    {
+        if (!($event instanceof Event))
+            return;
+
+        $workflowCollection = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows($event::getId());
 
         if (($event) instanceof CoreWorkflowEvents\Ticket\Create && $this->userService->isfileExists('apps/uvdesk/sla')) {
             $slaServiceClass = UVDeskCommunityPackages\SLA\Services\SlaService::class;

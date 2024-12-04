@@ -73,7 +73,6 @@ class PreparedResponsesRepository extends EntityRepository
 
         $paginationData['url'] = '#'.$container->get('uvdesk.service')->buildPaginationQuery($queryParameters);
 
-
         $data = $results->getItems();
         foreach ($data as $key => $row) {
             $data[$key]['user'] = $userService->getAgentDetailById($row['agentId']);
@@ -81,7 +80,7 @@ class PreparedResponsesRepository extends EntityRepository
 
         return [
             'preparedResponses' => $data,
-            'pagination_data' => $paginationData,
+            'pagination_data'   => $paginationData,
         ];
     }
 

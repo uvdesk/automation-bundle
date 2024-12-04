@@ -3,6 +3,9 @@ CHANGELOG for 1.1.x
 
 This changelog references any relevant changes introduced in 1.1 minor versions.
 
+* 1.1.2 
+    License and support email address update.
+
 * 1.1.2 (2023-06-12)
     * Update: Dropped dependency on uvdesk/composer-plugin in support of symfony/flex
     * Update: Change entity PreparedResponse::description param to type text from string

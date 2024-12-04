@@ -296,7 +296,7 @@ class AutomationService
         foreach ($this->container->get('uvdesk.automations.workflows')->getRegisteredWorkflowActions() as $workflowDefinition) {
             $functionalGroup = $workflowDefinition->getFunctionalGroup();
 
-            if (!isset($workflowActions[$functionalGroup])) {
+            if (! isset($workflowActions[$functionalGroup])) {
                 $workflowActions[$functionalGroup] = [];
             }
 
@@ -314,7 +314,7 @@ class AutomationService
         foreach ($this->container->get('uvdesk.automations.prepared_responses')->getRegisteredPreparedResponseActions() as $preparedResponseDefinition) {
             $functionalGroup = $preparedResponseDefinition->getFunctionalGroup();
 
-            if (!isset($preparedResponseActions[$functionalGroup])) {
+            if (! isset($preparedResponseActions[$functionalGroup])) {
                 $preparedResponseActions[$functionalGroup] = [];
             }
 

@@ -184,7 +184,7 @@ class WorkflowListener
         }
 
         foreach ($workflow->getConditions() as $condition) {
-            if (!empty($condition['operation']) && $condition['operation'] != "&&") {
+            if (! empty($condition['operation']) && $condition['operation'] != "&&") {
                 if (!isset($finalConditions[$index]['or'])) {
                     $finalConditions[$index]['or'] = [];
                 }
@@ -277,7 +277,7 @@ class WorkflowListener
                     $flag = $this->match($condition['match'], $entity->getSubject(), $condition['value']);
                     $createThread = $this->container->get('ticket.service')->getCreateReply($entity->getId(),false);
                     
-                    if (!$flag) {
+                    if (! $flag) {
                         $createThread = $this->container->get('ticket.service')->getCreateReply($entity->getId(),false);
                         $createThread['reply'] = rtrim(strip_tags($createThread['reply']), "\n" );
 
@@ -297,6 +297,7 @@ class WorkflowListener
             case 'TicketType':
                 if (isset($condition['value']) && $entity instanceof Ticket) {
                     $typeId = $entity->getType() ? $entity->getType()->getId() : 0;
+
                     return $this->match($condition['match'], $typeId, $condition['value']);
                 }
 
@@ -322,6 +323,7 @@ class WorkflowListener
             case 'created':
                 if (isset($condition['value']) && ($entity instanceof Ticket || $entity instanceof Task)) {
                     $date = date_format($entity->getCreatedAt(), "d-m-Y h:ia");
+
                     return $this->match($condition['match'], $date, $condition['value']);
                 }
 
@@ -335,6 +337,7 @@ class WorkflowListener
             case 'group':
                 if (isset($condition['value']) && $entity instanceof Ticket) {
                     $groupId = $entity->getSupportGroup() ? $entity->getSupportGroup()->getId() : 0;
+
                     return $this->match($condition['match'], $groupId, $condition['value']);
                 }
 
@@ -342,6 +345,7 @@ class WorkflowListener
             case 'team':
                 if (isset($condition['value']) && $entity instanceof Ticket) {
                     $subGroupId = $entity->getSupportTeam() ? $entity->getSupportTeam()->getId() : 0;
+
                     return $this->match($condition['match'], $subGroupId, $condition['value']);
                 }
 
@@ -349,6 +353,7 @@ class WorkflowListener
             case 'customer_name':
                 if (isset($condition['value']) && $entity instanceof Ticket) {
                     $lastThread = $this->container->get('ticket.service')->getTicketLastThread($entity->getId());
+                    
                     return $this->match($condition['match'], $entity->getCustomer()->getFullName(), $condition['value']);
                 }
                 

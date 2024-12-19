@@ -88,6 +88,7 @@
 		fetchResult: function(dataMatch, currentEvent) {
 			this.url = this.baseUrl+'/'+dataMatch + (currentEvent ? ('/' + currentEvent) : '');
 			this.reset();
+			
 			return this.fetch();
 		},
 	});
@@ -127,7 +128,7 @@
 			}
 			var value = this.value = e.target.value;
 			if (typeof(sB.actionselectView) != 'undefined') {
-				sB.actionselectView.removeduplicate(e);
+				sB.actionselectView.removeDuplicate(e);
 			}
 			this.selectOpt = this.$el.find('.wfAction');
 			this.siblingValue = this.$el.find('.apply-action');
@@ -135,12 +136,12 @@
 			this.siblingValue.find('select, textarea, div').remove();
 			if (value == 'uvdesk.agent.add_note' || value == 'reply') {
 				this.siblingValue.prepend(this.valueTextTemplate(_.extend(this.model, {'keyNo': this.keyNo})));
-			} else if (value != 'uvdesk.ticket.delete' && value != 'uvdesk.ticket.mark_spam' && value) {
+			} else if (value != 'uvdesk.ticket.delete' && value != 'uvdesk.ticket.mark_spam' && value != 'uvdesk.ticket.round_robin_ticket_assignment' && value) {
 				this.selectOpt.prop('disabled', true);
 				this.disable = true;
 				if (value == 'cc' || value == 'bcc') {
 					this.siblingValue.prepend(this.valueSelectMultipleTemplate(_.extend(this.model, {'keyNo': this.keyNo})));
-				} else if(this.value == 'uvdesk.ticket.mail_group' || this.value == 'uvdesk.ticket.mail_team' || this.value == "uvdesk.ticket.mail_agent") {
+				} else if (this.value == 'uvdesk.ticket.mail_group' || this.value == 'uvdesk.ticket.mail_team' || this.value == "uvdesk.ticket.mail_agent") {
 					this.siblingValue.prepend(this.valueMultiSelectTemplate(_.extend(this.model, {'keyNo': this.keyNo})));
 				} else {
 					this.siblingValue.prepend(this.valueSelectTemplate(_.extend(this.model, {'keyNo': this.keyNo})));
@@ -161,7 +162,7 @@
 			return ($('.wfEvents').eq(0).val() ? $('.wfEvents').eq(0).val() : 'ticket');
 		},
 		addAll: function() {
-			if(this.value == 'uvdesk.ticket.mail_group' || this.value == 'uvdesk.ticket.mail_team' || this.value == "uvdesk.ticket.mail_agent")
+			if (this.value == 'uvdesk.ticket.mail_group' || this.value == 'uvdesk.ticket.mail_team' || this.value == "uvdesk.ticket.mail_agent")
 				_.each(sB.actionCollection.models, this.addOneMore, this);
 			else
 				_.each(sB.actionCollection.models, this.addOne, this);
@@ -169,10 +170,10 @@
 			this.selectOpt.prop('disabled', false);
 		},
 		addOne: function(newModel) {
-			if(typeof(this.model.value) == 'object')
+			if (typeof(this.model.value) == 'object')
 				this.model.value = undefined;
 			var sendThisModel = _.extend(this.model, newModel.attributes);
-			if(typeof(newModel.attributes.id) != 'undefined')
+			if (typeof(newModel.attributes.id) != 'undefined')
 				this.siblingValue.find('.action-value').append(this.valueSelectOptionTemplate(sendThisModel));
 		},
 		addOneMore: function(models) {
@@ -200,7 +201,7 @@
 					setTimeout(function(e) {
 						$('#actions input,#actions select,#actions textarea').attr('disabled', 'disabled');
 						$('#actions .remove-action-tr').remove(); dIteration++;
-						if(dIteration<5)
+						if (dIteration < 5)
 							disableFieldFun();
 					}, 500);
 				};
@@ -224,10 +225,10 @@
 	        this.$(viewEl).find('.wfAction').trigger('change');
 	 		this.clearFirstTrSpan();
 		},
-		removeduplicate: function(e) {
+		removeDuplicate: function(e) {
 			//remove already exits elements - select
 		    $('.select-action').each(function() {
-				if(this.value == e.target.value)
+				if (this.value == e.target.value)
 					$(this).not(e.target).parents('tr').remove();
 		    });
 	 		this.clearFirstTrSpan();

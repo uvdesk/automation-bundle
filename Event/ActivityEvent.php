@@ -10,7 +10,6 @@ class ActivityEvent extends Event
 {
     private $entity;
     private $eventName;
-
     private $container;
     private $user;
     private $targetEntity;
@@ -42,7 +41,10 @@ class ActivityEvent extends Event
             $this->user = $params['user'];
         }
 
-        if (isset($params['subject']) && $params['subject'] != '') {
+        if (
+            isset($params['subject']) 
+            && $params['subject'] != ''
+        ) {
             $this->subject = $params['subject'];
         }
 

@@ -34,7 +34,7 @@ class Workflow extends AbstractController
 
     public function listWorkflowCollection(Request $request)
     {
-        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
+        if (! $this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -44,7 +44,7 @@ class Workflow extends AbstractController
     // Creating workflow
     public function createWorkflow(Request $request)
     {
-        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
+        if (! $this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -55,7 +55,7 @@ class Workflow extends AbstractController
 
         $form = $this->createForm(DefaultForm::class);
 
-        if($request->request->all()) {
+        if ($request->request->all()) {
             $form->submit($request->request->all());
         }
 
@@ -68,7 +68,7 @@ class Workflow extends AbstractController
                 $error['description'] = $this->translate('Warning! Please add valid Description! Length must not be greater than %desc%', ['%desc%' => self::DESCRIPTION_LENGTH]);
             }
 
-            if (!empty($workflowActionsArray)) {
+            if (! empty($workflowActionsArray)) {
                 foreach ($workflowActionsArray as $key => $action) {
                     if (!$action['type']) {
                         unset($workflowActionsArray[$key]);
@@ -82,7 +82,7 @@ class Workflow extends AbstractController
 
             // Remove blank values from arrays
             $workflowEventsArray = $request->request->get('events');
-            if (!empty($workflowEventsArray)) {
+            if (! empty($workflowEventsArray)) {
                 foreach ($workflowEventsArray as $key => $event) {
                     if (!$event['event']) {
                         unset($workflowEventsArray[$key]);
@@ -97,13 +97,12 @@ class Workflow extends AbstractController
             $workflowConditionsArray = $request->request->get('conditions');
             if ($workflowConditionsArray) {
                 foreach ($workflowConditionsArray as $key => $condition) {
-                    if (!$condition['type']) {
+                    if (! $condition['type']) {
                         unset($workflowConditionsArray[$key]);
                     }
                 }
             }
 
-          
             if (empty($error)) {
                 // Check if new workflow and old one belong to the same class
                 if (!empty($workflow) && $workflow instanceof $workflowClass) {
@@ -159,27 +158,27 @@ class Workflow extends AbstractController
             }
 
             $formData = [
-                'type' => $request->request->get('type'),
-                'name' => $request->request->get('name'),
+                'type'        => $request->request->get('type'),
+                'name'        => $request->request->get('name'),
                 'description' => $request->request->get('description'),
-                'status' => $request->request->get('status'),
-                'events' => $request->request->get('events'),
-                'actions' => $request->request->get('actions'),
-                'conditions' => $request->request->get('conditions'),
+                'status'      => $request->request->get('status'),
+                'events'      => $request->request->get('events'),
+                'actions'     => $request->request->get('actions'),
+                'conditions'  => $request->request->get('conditions'),
             ];
         }
       
         return $this->render('@UVDeskAutomation//Workflow//createWorkflow.html.twig', array(
-            'form' => $form->createView(),
-            'error' => $error,
+            'form'      => $form->createView(),
+            'error'     => $error,
             'formerror' => $formerror,
-            'formData' => $formData,
+            'formData'  => $formData,
         ));
     }
 
     public function editWorkflow(Request $request)
     {
-        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
+        if (! $this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -189,23 +188,23 @@ class Workflow extends AbstractController
         if ($request->attributes->get('id')) {
             $workflow = $entityManager->getRepository(Entity\Workflow::class)->findOneById($request->attributes->get('id'));
 
-            if (!empty($workflow)) {
+            if (! empty($workflow)) {
                 $formData = [
-                    'type' => self::WORKFLOW_AUTOMATIC,
-                    'name' => $workflow->getName(),
+                    'type'        => self::WORKFLOW_AUTOMATIC,
+                    'name'        => $workflow->getName(),
                     'description' => $workflow->getDescription(),
-                    'status' => $workflow->getStatus(),
-                    'actions' => $workflow->getActions(),
-                    'conditions' => $workflow->getConditions(),
-                    'events' => [],
+                    'status'      => $workflow->getStatus(),
+                    'actions'     => $workflow->getActions(),
+                    'conditions'  => $workflow->getConditions(),
+                    'events'      => [],
                 ];
 
                 foreach ($workflow->getWorkflowEvents() as $event) {
                     $eventDefinition = $this->workflowListnerService->getRegisteredWorkflowEvent($event->getEvent());
 
-                    if (!empty($eventDefinition)) {
+                    if (! empty($eventDefinition)) {
                         $formData['events'][] = [
-                            'event' => $eventDefinition->getFunctionalGroup(),
+                            'event'   => $eventDefinition->getFunctionalGroup(),
                             'trigger' => $eventDefinition->getId(),
                         ];
                     }
@@ -220,7 +219,7 @@ class Workflow extends AbstractController
 
         $form = $this->createForm(DefaultForm::class);
 
-        if($request->request->all()) {
+        if ($request->request->all()) {
             $form->submit($request->request->all());
         }
 
@@ -234,9 +233,9 @@ class Workflow extends AbstractController
                 $error['description'] = $this->translate('Warning! Please add valid Description! Length must not be greater than %desc%', ['%desc%' => self::DESCRIPTION_LENGTH]);
             }
 
-            if (!empty($workflowActionsArray)) {
+            if (! empty($workflowActionsArray)) {
                 foreach ($workflowActionsArray as $key => $action) {
-                    if (!$action['type']) {
+                    if (! $action['type']) {
                         unset($workflowActionsArray[$key]);
                     }
                 }
@@ -251,9 +250,9 @@ class Workflow extends AbstractController
 
             // Remove blank values from arrays
             $workflowEventsArray = $request->request->get('events');
-            if (!empty($workflowEventsArray)) {
+            if (! empty($workflowEventsArray)) {
                 foreach ($workflowEventsArray as $key => $event) {
-                    if (!$event['event']) {
+                    if (! $event['event']) {
                         unset($workflowEventsArray[$key]);
                     }
                 }
@@ -279,7 +278,7 @@ class Workflow extends AbstractController
             $workflowConditionsArray = $request->request->get('conditions');
             if ($workflowConditionsArray) {
                 foreach ($workflowConditionsArray as $key => $condition) {
-                    if (!$condition['type']) {
+                    if (! $condition['type']) {
                         unset($workflowConditionsArray[$key]);
                     }
                 }
@@ -287,7 +286,7 @@ class Workflow extends AbstractController
 
             if (empty($error)) {
                 // Check if new workflow and old one belong to the same class
-                if (!empty($workflow) && $workflow instanceof $workflowClass) {
+                if (! empty($workflow) && $workflow instanceof $workflowClass) {
                     $newWorkflow = $workflow;
                 } else {
                     $newWorkflow = new $workflowClass;
@@ -309,7 +308,7 @@ class Workflow extends AbstractController
                 if ($newWorkflow->getWorkflowEvents()) {
                     foreach ($newWorkflow->getWorkflowEvents() as $newWorkflowEvent) {
                         if ($thisKey = array_search([
-                            'event' => current($exNewEventEvent = explode('.', $newWorkflowEvent->getEvent())), 
+                            'event'   => current($exNewEventEvent = explode('.', $newWorkflowEvent->getEvent())), 
                             'trigger' => end($exNewEventEvent)
                         ], $formDataGetEvents)) {
                             unset($formDataGetEvents[$thisKey]);
@@ -350,29 +349,30 @@ class Workflow extends AbstractController
             }
 
             $formData = [
-                'type' => $request->request->get('type'),
-                'name' => $request->request->get('name'),
+                'type'        => $request->request->get('type'),
+                'name'        => $request->request->get('name'),
                 'description' => $request->request->get('description'),
-                'status' => $request->request->get('status'),
-                'events' => $request->request->get('events'),
-                'actions' => $request->request->get('actions'),
-                'conditions' => $request->request->get('conditions'),
+                'status'      => $request->request->get('status'),
+                'events'      => $request->request->get('events'),
+                'actions'     => $request->request->get('actions'),
+                'conditions'  => $request->request->get('conditions'),
             ];
         }
       
         return $this->render('@UVDeskAutomation//Workflow//editWorkflow.html.twig', array(
-            'form' => $form->createView(),
-            'error' => $error,
+            'form'      => $form->createView(),
+            'error'     => $error,
             'formerror' => $formerror,
-            'formData' => $formData,
+            'formData'  => $formData,
         ));
     }
 
-    //Remove Workflow
+    // Remove Workflow
     public function deleteWorkflow(Request $request)
     {
 
-    } 
+    }
+
     public function translate($string,$params = array())
     {
         return $this->translator->trans($string,$params);

@@ -20,6 +20,7 @@ services:
         arguments: ['@service_container', '@doctrine.orm.entity_manager']
         tags:
             - { name: kernel.event_listener, event: uvdesk.automation.workflow.execute, method: executeWorkflow }
+            - { name: kernel.event_listener, event: uvdesk.automation.report_app.workflow.execute, method: executeReplyEvent }
     
     Webkul\UVDesk\AutomationBundle\EventListener\PreparedResponseListener:
         arguments: ['@service_container', '@doctrine.orm.entity_manager']

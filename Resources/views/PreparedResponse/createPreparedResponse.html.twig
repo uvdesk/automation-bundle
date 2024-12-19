@@ -268,11 +268,11 @@
                 this.setAddedIds('#team-filter');
             },
             events: {
-                'submit form[name="form-workflow"]': 'processWorlfow',
+                'submit form[name="form-workflow"]': 'processWorkflow',
                 'click .workflow-form .uv-dropdown-list li': 'addEntity',
                 'click .workflow-form .uv-filtered-tags .uv-btn-small': 'removeEntity'                
             },
-            processWorlfow: function(e) {
+            processWorkflow: function(e) {
                 this.model.set(this.$el.find('form').serializeObject());
 
                 var self = this;

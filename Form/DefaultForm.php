@@ -19,7 +19,7 @@ class DefaultForm extends AbstractType
     {
         $builder->add('submit', ButtonType::class, array(
                         'label' => 'Add Workflow',
-                        'attr' => array('class' => 'btn btn-md btn-info'),
+                        'attr'  => array('class' => 'btn btn-md btn-info'),
                         )
                     );
     }

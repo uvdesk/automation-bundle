@@ -4,7 +4,6 @@ namespace Webkul\UVDesk\AutomationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-
 /**
  * Workflow
  * @ORM\HasLifecycleCallbacks

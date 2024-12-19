@@ -177,17 +177,17 @@
 							app.pager.paginationData = response.pagination_data;
 
 							var url = app.pager.paginationData.url;
-							if(prepareResponseCollection.length == 0 && app.pager.paginationData.current != "0")
+							if (prepareResponseCollection.length == 0 && app.pager.paginationData.current != "0")
 								router.navigate(url.replace('replacePage', app.pager.paginationData.last),{trigger: true});
 							else {
 								app.pager.render();
 							}
-							if(globalMessageResponse)
+							if (globalMessageResponse)
 								app.appView.renderResponseAlert(globalMessageResponse);
 							globalMessageResponse = null;
 						},
 						error: function (model, xhr, options) {
-							if(url = xhr.getResponseHeader('Location'))
+							if (url = xhr.getResponseHeader('Location'))
 								window.location = url;
 						}
 					});
@@ -202,10 +202,11 @@
 				},
 				render : function() {
 					this.$el.html(this.template(this.model.toJSON()));
+					
 					return this;
 				},
 				unrender : function(response) {
-					if(response.alertMessage != undefined) {
+					if (response.alertMessage != undefined) {
 						prepareResponseCollection.syncData();
 						app.appView.renderResponseAlert(response)
 					}
@@ -225,10 +226,10 @@
 							prepareResponseCollection.syncData();
 						},
 						error: function (model, xhr, options) {
-							if(url = xhr.getResponseHeader('Location'))
+							if (url = xhr.getResponseHeader('Location'))
 								window.location = url;
 							var response = warningResponse;
-							if(xhr.responseJSON)
+							if (xhr.responseJSON)
 								response = xhr.responseJSON;
 
 							app.appView.hideLoader();
@@ -245,7 +246,7 @@
 				},
 				render : function () {
 					this.$el.find("tr").remove();
-					if(prepareResponseCollection.length) {
+					if (prepareResponseCollection.length) {
 						_.each(prepareResponseCollection.models, function (item) {
 							this.renderPrepareResponse(item);
 						}, this);
@@ -314,7 +315,7 @@
 					prepareResponseCollection.syncData();
 				},
 				resetParams : function(status, query) {
-					if(query != null)
+					if (query != null)
 						query = query.replace(/\+/g,' ');
 					prepareResponseCollection.filterParameters.status = status;
 					var statusText = status ? $(".filter-by-status a[data-id='" + status + "']").text() : "{% trans %}All{% endtrans %}";

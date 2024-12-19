@@ -94,7 +94,12 @@ class WorkflowListener
             ) {
                 $thread = $event->getThread();
 
-                if ($thread && $thread->getThreadType() == 'reply' && ($thread->getcreatedBy() == 'agent' || $thread->getcreatedBy() == 'customer')) {
+                if (
+                    $thread 
+                    && $thread->getThreadType() == 'reply' 
+                    && ($thread->getCreatedBy() == 'agent' 
+                    || $thread->getCreatedBy() == 'customer')
+                ) {
                     $reportService->calculateResponseTime($thread);
                 }
             }
@@ -103,7 +108,7 @@ class WorkflowListener
 
     public function executeWorkflow($event)
     {
-        if (!($event instanceof Event))
+        if (! ($event instanceof Event))
             return;
 
         $workflowCollection = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows($event::getId());
@@ -146,7 +151,7 @@ class WorkflowListener
             }
         }
         
-        if (!empty($workflowCollection)) {
+        if (! empty($workflowCollection)) {
             foreach ($workflowCollection as $workflow) {
                 $totalConditions = 0;
                 $totalEvaluatedConditions = 0;

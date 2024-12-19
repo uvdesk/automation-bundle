@@ -111,7 +111,7 @@
 
 			var value = this.value = e.target.value;
 			if (typeof(sB.actionselectView) != 'undefined') {
-				sB.actionselectView.removeduplicate(e);
+				sB.actionselectView.removeDuplicate(e);
 			}
 
 			this.selectOpt = this.$el.find('.wfAction');
@@ -212,7 +212,7 @@
 	        this.$(viewEl).find('.wfAction').trigger('change');
 	 		this.clearFirstTrSpan();
 		},
-		removeduplicate: function(e) {
+		removeDuplicate: function(e) {
 			//remove already exits elements - select
 		    $('.select-action').each(function() {
 				if(this.value == e.target.value)

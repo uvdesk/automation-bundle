@@ -268,11 +268,11 @@
                 this.setAddedIds('#team-filter');
             },
             events: {
-                'submit form[name="form-workflow"]': 'processWorlfow',
+                'submit form[name="form-workflow"]': 'processWorkflow',
                 'click .workflow-form .uv-dropdown-list li': 'addEntity',
                 'click .workflow-form .uv-filtered-tags .uv-btn-small': 'removeEntity'                
             },
-            processWorlfow: function(e) {
+            processWorkflow: function(e) {
                 this.model.set(this.$el.find('form').serializeObject());
 
                 var self = this;
@@ -315,12 +315,12 @@
             },
             addEntity: function(e) {
                 currentElement = Backbone.$(e.currentTarget);
-                if(id = currentElement.attr("data-id")) {
+                if (id = currentElement.attr("data-id")) {
                     parent = currentElement.parents(".uv-field-block");
                     parent.find('input').val('')
                     parent.find("li:not(.uv-no-results)").show();
 
-                    if(!parent.find(".uv-filtered-tags a[data-id='" + id + "']").length) {
+                    if (!parent.find(".uv-filtered-tags a[data-id='" + id + "']").length) {
                         parent.find('.uv-filtered-tags').append("<a class='uv-btn-small default' href='#' data-id='" + id + "'>"+currentElement.text()+"<span class='uv-icon-remove'></span></a>")
                         this.setAddedIds("#" + parent.attr('id'))
                     }

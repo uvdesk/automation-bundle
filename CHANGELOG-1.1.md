@@ -3,8 +3,10 @@ CHANGELOG for 1.1.x
 
 This changelog references any relevant changes introduced in 1.1 minor versions.
 
-* 1.1.2 
-    License and support email address update.
+* 1.1.3 (2024-12-19)
+   * License and support email address update.
+   * Round robin ticket assignments update.
+   * Code Refactoring.
 
 * 1.1.2 (2023-06-12)
     * Update: Dropped dependency on uvdesk/composer-plugin in support of symfony/flex

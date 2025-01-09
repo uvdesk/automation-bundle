@@ -119,6 +119,10 @@ class WorkflowListener
             $slaService->refreshTicketPolicies($event->getTicket());
         }
 
+        if (($event) instanceof CoreWorkflowEvents\Ticket\Status) {
+            $this->executeReplyEvent($event);
+        }
+
         /*
             @NOTICE: Events 'uvdesk.agent.forgot_password', 'uvdesk.customer.forgot_password' will be deprecated 
             onwards uvdesk/automation-bundle:1.1.2 and uvdesk/core-framework:1.1.3 releases and will be 

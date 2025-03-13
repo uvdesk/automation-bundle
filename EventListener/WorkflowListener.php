@@ -113,7 +113,7 @@ class WorkflowListener
 
         $workflowCollection = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows($event::getId());
 
-        if (($event) instanceof CoreWorkflowEvents\Ticket\Create && $this->userService->isFileExists('apps/uvdesk/sla')) {
+        if ((($event) instanceof CoreWorkflowEvents\Ticket\Create || $event instanceof CoreWorkflowEvents\Ticket\Priority) && $this->userService->isFileExists('apps/uvdesk/sla')) {
             $slaServiceClass = UVDeskCommunityPackages\SLA\Services\SlaService::class;
             $slaService = new $slaServiceClass($this->container, $this->entityManager );
             $slaService->refreshTicketPolicies($event->getTicket());

@@ -2,12 +2,8 @@
 
 namespace Webkul\UVDesk\AutomationBundle\Controller\Automations;
 
-use Doctrine\Common\Collections\Criteria;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Webkul\UVDesk\AutomationBundle\Entity;
@@ -36,7 +32,7 @@ class PreparedResponse extends AbstractController
 
     public function prepareResponseList(Request $request)
     {
-        if (!$this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
+        if (! $this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
 
@@ -51,8 +47,6 @@ class PreparedResponse extends AbstractController
 
         $error = $formData = $formerror = [];
         $entityManager = $em = $this->getDoctrine()->getManager();
-
-        $workflowEventType = false;
 
         $form = $this->createForm(DefaultForm::class);
 
@@ -87,33 +81,38 @@ class PreparedResponse extends AbstractController
 
             if (empty($error)) {
                 // Check if new workflow and old one belong to the same class
-                if (!empty($workflow) && $workflow instanceof $workflowClass) {
-                    $newWorkflow = $workflow;
-                } else {
-                    $newWorkflow = new $workflowClass;
-                    if (! empty($workflow)) {
-                        $entityManager->remove($workflow);
-                        $entityManager->flush();
-                    }
+                $newWorkflow = ! empty($workflow) && $workflow instanceof $workflowClass ? $workflow : new $workflowClass;
+
+                if (! empty($workflow)) {
+                    $entityManager->remove($workflow);
+                    $entityManager->flush();
                 }
 
                 if ($this->userService->isAccessAuthorized('ROLE_ADMIN')) {
-                    /* groups */ 
+                    /* groups */
                     $groups = explode(',', $request->request->get('tempGroups'));
                     $previousGroupIds = [];
+
                     if ($newWorkflow->getGroups()) {
                         foreach ($newWorkflow->getGroups() as $key => $group) {
                             $previousGroupIds[] = $group->getId();
+
                             if (! in_array($group->getId(), $groups )) {
                                 $newWorkflow->removeGroup($group);
                                 $em->persist($newWorkflow);
                             }
                         }
                     }
+
                     foreach ($groups as $key => $groupId) {
                         if ($groupId) {
                             $group = $em->getRepository(SupportGroup::class)->findOneBy(['id' => $groupId]);
-                            if ($group && (empty($previousGroupIds) || !in_array($groupId, $previousGroupIds))) {
+
+                            if (
+                                $group
+                                && (empty($previousGroupIds)
+                                || ! in_array($groupId, $previousGroupIds))
+                            ) {
                                 $newWorkflow->addGroup($group);
                                 $em->persist($newWorkflow);
                             }
@@ -123,20 +122,24 @@ class PreparedResponse extends AbstractController
                     /* teams */
                     $teams = explode(',', $request->request->get('tempTeams'));
                     $previousTeamIds = [];
+
                     if ($newWorkflow->getTeams()) {
                         foreach ($newWorkflow->getTeams() as $key => $team) {
                             $previousTeamIds[] = $team->getId();
+
                             if (! in_array($team->getId(), $teams )) {
                                 $newWorkflow->removeTeam($team);
                                 $em->persist($newWorkflow);
                             }
                         }
                     }
+
                     foreach ($teams as $key => $teamId) {
                         if ($teamId) {
                             $team = $em->getRepository(SupportTeam::class)->findOneBy([ 'id' => $teamId]);
+
                             if (
-                                $team 
+                                $team
                                 && (empty($previousTeamIds)
                                 || !in_array($teamId, $previousTeamIds))
                             ) {
@@ -152,12 +155,13 @@ class PreparedResponse extends AbstractController
                 $newWorkflow->setStatus($formData->get('status') == 'on' ? true : false);
 
                 $userData = $this->userService->getUserDetailById($this->getUser()->getId());
+
                 if (! $newWorkflow->getUser()) {
                     $newWorkflow->setUser($userData);
                 }
 
                 if (
-                    ($newWorkflow->getUser()->getId() == $userData->getId()) 
+                    ($newWorkflow->getUser()->getId() == $userData->getId())
                     || $this->userService->isAccessAuthorized('ROLE_ADMIN')
                 ) {
                     $newWorkflow->setActions($workflowActionsArray);
@@ -169,7 +173,7 @@ class PreparedResponse extends AbstractController
 
                 $this->addFlash('success', $request->attributes->get('id')
                     ? $this->translator->trans('Success! Prepared Response has been updated successfully.')
-                    :  $this->translator->trans('Success! Prepared Response has been added successfully.')
+                    : $this->translator->trans('Success! Prepared Response has been added successfully.')
                 );
 
                 return $this->redirectToRoute('prepare_response_action');
@@ -194,7 +198,6 @@ class PreparedResponse extends AbstractController
         ));
     }
 
-
     public function editPrepareResponse(Request $request, ContainerInterface $container)
     {
         if (! $this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_MANUAL')) {
@@ -203,24 +206,23 @@ class PreparedResponse extends AbstractController
 
         $error = $formData = $formerror = [];
         $entityManager = $em = $this->getDoctrine()->getManager();
-        
+
         if ($request->attributes->get('id')) {
             $workflow = $entityManager->getRepository(Entity\PreparedResponses::class)->getPreparedResponse($request->attributes->get('id'), $container);
 
-            if (!empty($workflow)) {
-                $formData = [
-                    'type'        => self::WORKFLOW_MANUAL,
-                    'name'        => $workflow->getName(),
-                    'description' => $workflow->getDescription(),
-                    'status'      => $workflow->getStatus(),
-                    'actions'     => $workflow->getActions(),
-                    'groups'      => $workflow->getGroups(),
-                    'teams'       => $workflow->getTeams()
-                ];
-            } else {
-                // Workflow not found
+            if (empty($workflow)) {
                 $this->noResultFound();
             }
+
+            $formData = [
+                'type'        => self::WORKFLOW_MANUAL,
+                'name'        => $workflow->getName(),
+                'description' => $workflow->getDescription(),
+                'status'      => $workflow->getStatus(),
+                'actions'     => $workflow->getActions(),
+                'groups'      => $workflow->getGroups(),
+                'teams'       => $workflow->getTeams()
+            ];
         }
 
         $workflowEventType = false;
@@ -238,7 +240,7 @@ class PreparedResponse extends AbstractController
             $workflowActionsArray = $request->request->get('actions');
 
             if (
-                !trim($formData->get('name')) 
+                !trim($formData->get('name'))
                 || (strlen($formData->get('name')) > self::NAME_LENGTH)
             ) {
                 $error['name'] = $this->translator->trans('Warning! Please add valid Name! Length must not be greater than %length%', ['%length%' => self::NAME_LENGTH]);
@@ -262,26 +264,22 @@ class PreparedResponse extends AbstractController
 
             if (empty($error)) {
                 // Check if new workflow and old one belong to the same class
-                if (
-                    ! empty($workflow) 
-                    && $workflow instanceof $workflowClass
-                ) {
-                    $newWorkflow = $workflow;
-                } else {
-                    $newWorkflow = new $workflowClass;
-                    if (! empty($workflow)) {
-                        $entityManager->remove($workflow);
-                        $entityManager->flush();
-                    }
+                $newWorkflow = ! empty($workflow) && $workflow instanceof $workflowClass ? $workflow : new $workflowClass;
+
+                if (! empty($workflow)) {
+                    $entityManager->remove($workflow);
+                    $entityManager->flush();
                 }
-                
+
                 if ($this->userService->isAccessAuthorized('ROLE_ADMIN')) {
-                    /* groups */ 
+                    /* groups */
                     $groups = explode(',', $request->request->get('tempGroups'));
                     $previousGroupIds = [];
+
                     if ($newWorkflow->getGroups()) {
                         foreach ($newWorkflow->getGroups() as $key => $group) {
                             $previousGroupIds[] = $group->getId();
+
                             if (! in_array($group->getId(), $groups)) {
                                 $newWorkflow->removeGroup($group);
                                 $em->persist($newWorkflow);
@@ -292,9 +290,10 @@ class PreparedResponse extends AbstractController
                     foreach ($groups as $key => $groupId) {
                         if ($groupId) {
                             $group = $em->getRepository(SupportGroup::class)->findOneBy([ 'id' => $groupId]);
+
                             if (
-                                $group 
-                                && (empty($previousGroupIds) 
+                                $group
+                                && (empty($previousGroupIds)
                                 || !in_array($groupId, $previousGroupIds))
                             ) {
                                 $newWorkflow->addGroup($group);
@@ -306,9 +305,11 @@ class PreparedResponse extends AbstractController
                     /* teams */
                     $teams = explode(',', $request->request->get('tempTeams'));
                     $previousTeamIds = [];
+
                     if ($newWorkflow->getTeams()) {
                         foreach ($newWorkflow->getTeams() as $key => $team) {
                             $previousTeamIds[] = $team->getId();
+
                             if (! in_array($team->getId(), $teams)) {
                                 $newWorkflow->removeTeam($team);
                                 $em->persist($newWorkflow);
@@ -319,10 +320,11 @@ class PreparedResponse extends AbstractController
                     foreach ($teams as $key => $teamId) {
                         if ($teamId) {
                             $team = $em->getRepository(SupportTeam::class)->findOneBy([ 'id' => $teamId]);
+
                             if (
-                                $team 
-                                && (empty($previousTeamIds) 
-                                || !in_array($teamId, $previousTeamIds)) 
+                                $team
+                                && (empty($previousTeamIds)
+                                || !in_array($teamId, $previousTeamIds))
                             ) {
                                 $newWorkflow->addTeam($team);
                                 $em->persist($newWorkflow);
@@ -336,11 +338,15 @@ class PreparedResponse extends AbstractController
                 $newWorkflow->setStatus($formData->get('status') == 'on' ? true : false);
 
                 $userData = $this->userService->getUserDetailById($this->getUser()->getId());
+
                 if (! $newWorkflow->getUser()) {
                     $newWorkflow->setUser($userData);
                 }
 
-                if ($newWorkflow->getUser()->getId() == $userData->getId() || $this->userService->isAccessAuthorized('ROLE_ADMIN')) {
+                if (
+                    $newWorkflow->getUser()->getId() == $userData->getId()
+                    || $this->userService->isAccessAuthorized('ROLE_ADMIN')
+                ) {
                     $newWorkflow->setActions($workflowActionsArray);
                 }
 

@@ -11,14 +11,15 @@ class PreparedResponsePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has(PreparedResponseListener::class)) {
+        if (! $container->has(PreparedResponseListener::class)) {
             return;
         }
+
         $preparedResponseDefinition = $container->findDefinition(PreparedResponseListener::class);
-        
+
         // Register Prepared Response Actions
         $preparedResponseTaggedServices = $container->findTaggedServiceIds('uvdesk.automations.prepared_response.actions');
-        
+
         foreach ($preparedResponseTaggedServices as $serviceId => $serviceTags) {
             $preparedResponseDefinition->addMethodCall('registerPreparedResponseAction', array(new Reference($serviceId)));
         }

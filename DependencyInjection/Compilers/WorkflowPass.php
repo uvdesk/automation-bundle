@@ -11,7 +11,7 @@ class WorkflowPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has(WorkflowListener::class)) {
+        if (! $container->has(WorkflowListener::class)) {
             return;
         }
 
@@ -19,14 +19,14 @@ class WorkflowPass implements CompilerPassInterface
 
         // Register Workflow Event
         $taggedWorkflowEvents = $container->findTaggedServiceIds('uvdesk.automations.workflow.events');
-        
+
         foreach ($taggedWorkflowEvents as $serviceId => $serviceTags) {
             $workflowDefinition->addMethodCall('registerWorkflowEvent', array(new Reference($serviceId)));
         }
 
         // Register Workflow Actions
         $workflowTaggedServices = $container->findTaggedServiceIds('uvdesk.automations.workflow.actions');
-        
+
         foreach ($workflowTaggedServices as $serviceId => $serviceTags) {
             $workflowDefinition->addMethodCall('registerWorkflowAction', array(new Reference($serviceId)));
         }

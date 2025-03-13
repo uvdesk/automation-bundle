@@ -39,7 +39,6 @@ class WorkflowEvents
      */
     private $workflow;
 
-
     /**
      * Get id
      *
@@ -122,4 +121,3 @@ class WorkflowEvents
         return $this->workflow;
     }
 }
-

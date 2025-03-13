@@ -20,7 +20,6 @@ class PreparedResponsesRepository extends EntityRepository
 
     public function getPreparesResponses(\Symfony\Component\HttpFoundation\ParameterBag $obj = null, $container)
     {
-        
         $userService = $container->get('user.service');
 
         $qb = $this->getEntityManager()->createQueryBuilder()
@@ -51,8 +50,8 @@ class PreparedResponsesRepository extends EntityRepository
                     break;
             }
         }
- 
-        if (!isset($data['sort'])) {
+
+        if (! isset($data['sort'])) {
             $qb->orderBy('pr.id',Criteria::DESC);
         }
 
@@ -74,6 +73,7 @@ class PreparedResponsesRepository extends EntityRepository
         $paginationData['url'] = '#'.$container->get('uvdesk.service')->buildPaginationQuery($queryParameters);
 
         $data = $results->getItems();
+
         foreach ($data as $key => $row) {
             $data[$key]['user'] = $userService->getAgentDetailById($row['agentId']);
         }
@@ -84,7 +84,7 @@ class PreparedResponsesRepository extends EntityRepository
         ];
     }
 
-    public function getPreparedResponse($id) 
+    public function getPreparedResponse($id)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('DISTINCT pr')->from($this->getEntityName(), 'pr')
@@ -93,7 +93,7 @@ class PreparedResponsesRepository extends EntityRepository
             ->andWhere('pr.id'.' = :id')
             ->setParameter('id', $id)
             ->groupBy('pr.id');
-            
+
         return $qb->getQuery()->getOneOrNullResult();
     }
 }

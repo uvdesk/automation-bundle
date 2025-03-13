@@ -3,12 +3,8 @@ namespace Webkul\UVDesk\AutomationBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Webkul\CoreFrameworkBundle\Entity\Workflow;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
-
-
 
 class DefaultForm extends AbstractType
 {

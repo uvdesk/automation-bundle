@@ -10,7 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="Webkul\UVDesk\AutomationBundle\Repository\PreparedResponsesRepository")
  * @ORM\Table(name="uv_prepared_responses")
  */
-
 class PreparedResponses
 {
     /**
@@ -40,6 +39,33 @@ class PreparedResponses
     private $type;
 
     /**
+     * @var \Webkul\UserBundle\Entity\UserData
+     * @ORM\ManyToOne(targetEntity="Webkul\UVDesk\CoreFrameworkBundle\Entity\UserInstance")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    private $user;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     * @ORM\ManyToMany(targetEntity="Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportGroup")
+     * @ORM\JoinTable(name="uv_prepared_response_support_groups",
+     *      joinColumns={@ORM\JoinColumn(name="savedReply_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
+     *  )
+     */
+    private $groups;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     * @ORM\ManyToMany(targetEntity="Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportTeam")
+     * @ORM\JoinTable(name="uv_prepared_response_support_teams",
+     *      joinColumns={@ORM\JoinColumn(name="savedReply_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="subgroup_id", referencedColumnName="id", onDelete="CASCADE")}
+     *  )
+     */
+    private $teams;
+
+    /**
      * @var array
      * @ORM\Column(type="array")
      */
@@ -64,9 +90,18 @@ class PreparedResponses
     private $dateUpdated;
 
     /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->groups = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->teams = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -89,7 +124,7 @@ class PreparedResponses
     /**
      * Get name
      *
-     * @return string 
+     * @return string
      */
     public function getName()
     {
@@ -112,7 +147,7 @@ class PreparedResponses
     /**
      * Get description
      *
-     * @return string 
+     * @return string
      */
     public function getDescription()
     {
@@ -135,7 +170,7 @@ class PreparedResponses
     /**
      * Get type
      *
-     * @return string 
+     * @return string
      */
     public function getType()
     {
@@ -158,7 +193,7 @@ class PreparedResponses
     /**
      * Get actions
      *
-     * @return array 
+     * @return array
      */
     public function getActions()
     {
@@ -181,7 +216,7 @@ class PreparedResponses
     /**
      * Get status
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getStatus()
     {
@@ -204,7 +239,7 @@ class PreparedResponses
     /**
      * Get dateAdded
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getDateAdded()
     {
@@ -227,7 +262,7 @@ class PreparedResponses
     /**
      * Get dateUpdated
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getDateUpdated()
     {
@@ -250,13 +285,6 @@ class PreparedResponses
     {
         $this->dateUpdated = new \DateTime();
     }
-    /**
-     * @var \Webkul\UserBundle\Entity\UserData
-     * @ORM\ManyToOne(targetEntity="Webkul\UVDesk\CoreFrameworkBundle\Entity\UserInstance")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    private $user;
-
 
     /**
      * Set user
@@ -274,42 +302,11 @@ class PreparedResponses
     /**
      * Get user
      *
-     * @return \Webkul\UVDesk\CoreFrameworkBundle\Entity\UserInstance 
+     * @return \Webkul\UVDesk\CoreFrameworkBundle\Entity\UserInstance
      */
     public function getUser()
     {
         return $this->user;
-    }
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     * @ORM\ManyToMany(targetEntity="Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportGroup")
-     * @ORM\JoinTable(name="uv_prepared_response_support_groups",
-     *      joinColumns={@ORM\JoinColumn(name="savedReply_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
-     *  )
-     */
-    private $groups;
-
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     * @ORM\ManyToMany(targetEntity="Webkul\UVDesk\CoreFrameworkBundle\Entity\SupportTeam")
-     * @ORM\JoinTable(name="uv_prepared_response_support_teams",
-     *      joinColumns={@ORM\JoinColumn(name="savedReply_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="subgroup_id", referencedColumnName="id", onDelete="CASCADE")}
-     *  )
-     */
-    private $teams;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->groups = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->teams = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -338,7 +335,7 @@ class PreparedResponses
     /**
      * Get groups
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getGroups()
     {
@@ -371,7 +368,7 @@ class PreparedResponses
     /**
      * Get teams
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getTeams()
     {

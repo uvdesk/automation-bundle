@@ -5,7 +5,6 @@ namespace Webkul\UVDesk\AutomationBundle\Event;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-// @TODO: Refactor this code
 class ActivityEvent extends Event
 {
     private $entity;
@@ -85,7 +84,7 @@ class ActivityEvent extends Event
     {
         $user = $this->container->get('user.service')->getSessionUser();
 
-        return !empty($user) ? $user : $this->user;
+        return ! empty($user) ? $user : $this->user;
     }
 
     public function getSubject()

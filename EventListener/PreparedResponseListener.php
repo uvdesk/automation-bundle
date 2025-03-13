@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Webkul\UVDesk\AutomationBundle\Entity\PreparedResponses;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Webkul\UVDesk\CoreFrameworkBundle\Entity\Ticket;
 use Webkul\UVDesk\AutomationBundle\PreparedResponse\Action as PreparedResponseAction;
 
 class PreparedResponseListener
@@ -35,7 +34,7 @@ class PreparedResponseListener
     {
         $preparedResponse = $this->entityManager->getRepository(PreparedResponses::class)->getPreparedResponse($event->getSubject());
         
-        if (!empty($preparedResponse)) {
+        if (! empty($preparedResponse)) {
             $this->applyPreparedResponseActions($preparedResponse , $event->getArgument('entity'));
         }
     }
@@ -46,7 +45,7 @@ class PreparedResponseListener
             if (empty($attributes['type'])) {
                 continue;
             }
-            
+
             foreach ($this->getRegisteredPreparedResponseActions() as $preparedResponseAction) {
                 if ($preparedResponseAction->getId() == $attributes['type']) {
                     $preparedResponseAction->applyAction($this->container, $entity, isset($attributes['value']) ? $attributes['value']: '');

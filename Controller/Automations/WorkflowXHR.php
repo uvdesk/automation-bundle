@@ -18,7 +18,7 @@ class WorkflowXHR extends AbstractController
     private $translator;
     private $workflowListnerService;
     private $ticketService;
-    
+
     public function __construct(UserService $userService, WorkflowListener $workflowListnerService, TicketService $ticketService,TranslatorInterface $translator)
     {
         $this->userService = $userService;
@@ -45,62 +45,52 @@ class WorkflowXHR extends AbstractController
 
     public function WorkflowsxhrAction(Request $request)
     {
+        $json = [];
+
         if (! $this->userService->isAccessAuthorized('ROLE_AGENT_MANAGE_WORKFLOW_AUTOMATIC')) {
             return $this->redirect($this->generateUrl('helpdesk_member_dashboard'));
         }
-        
-        $json = [];
-        $error = false;
+
         if ($request->isXmlHttpRequest()){
-            if ($request->getMethod() == 'POST') { 
+            if ($request->getMethod() == 'POST') {
                 $em = $this->getDoctrine()->getManager();
                 //sort order update
                 $workflows = $em->getRepository(Entity\Workflow::class)->findAll();
-                   
                 $sortOrders = $request->request->get('orders');
+
                 if (count($workflows)) {
                     foreach ($workflows as $id => $workflow) {
-                        if (! empty($sortOrders[$workflow->getId()])) {
-                            $workflow->setSortOrder($sortOrders[$workflow->getId()]);
-                            $em->persist($workflow);
-                        } else {
+                        if (empty($sortOrders[$workflow->getId()])) {
                             $error = true;
-                            break;                        
+                            break;
                         }
+
+                        $workflow->setSortOrder($sortOrders[$workflow->getId()]);
+                        $em->persist($workflow);
                     }
+
                     $em->flush();
-                }
-                if(!$error) {
+
                     $json['alertClass'] = 'success';
                     $json['alertMessage'] = $this->translator->trans('Success! Order has been updated successfully.');
                 }
-            }
-            elseif ($request->getMethod() == 'DELETE') {
-                //$this->isAuthorized(self::ROLE_REQUIRED_AUTO);
-
+            } elseif ($request->getMethod() == 'DELETE') {
                 $em = $this->getDoctrine()->getManager();
                 $id = $request->attributes->get('id');
-                //$workFlow = $this->getWorkflow($id, 'Events');
-                $workFlow = $em->getRepository(Entity\Workflow::class)
-                            ->findOneBy(array('id' => $id));
 
-                if (! empty($workFlow)) {
+                $workFlow = $em->getRepository(Entity\Workflow::class)->findOneBy(array('id' => $id));
+
+                if (empty($workFlow)) {
+                    $json['alertClass'] = 'danger';
+                    $json['alertMessage'] = $this->translator->trans('Warning! No workflow found.');
+                } else {
                     $em->remove($workFlow);
                     $em->flush();
-                } else {
-                    $error = true;
-                }
 
-                if (! $error) {
                     $json['alertClass'] = 'success';
                     $json['alertMessage'] = $this->translator->trans('Success! Workflow has been removed successfully.');
                 }
             }
-        }
-
-        if ($error) {
-            $json['alertClass'] = 'danger';
-            $json['alertMessage'] = $this->translator->trans('Warning! You are not allowed to perform this action.');
         }
 
         $response = new Response(json_encode($json));
@@ -108,22 +98,29 @@ class WorkflowXHR extends AbstractController
 
         return $response;
     }
-    
+
     public function getWorkflowConditionOptionsXHR($entity, Request $request)
     {
-        $error = false;
         $json = $results = array();
-        $supportedConditions = ['TicketPriority', 'TicketType', 'TicketStatus', 'source', 'agent', 'group','team', 'agent_name', 'agent_email', 'stage'];
+        $supportedConditions = [
+            'team',
+            'stage',
+            'agent',
+            'group',
+            'source',
+            'agent_name',
+            'agent_email',
+            'TicketType',
+            'TicketPriority',
+            'TicketStatus',
+        ];
 
-        if (! $request->isXmlHttpRequest()) {
+        if (
+            ! $request->isXmlHttpRequest()
+            || ($request->getMethod() != 'GET'
+            || !in_array($entity, $supportedConditions))
+        ) {
             throw new Exception('', 404);
-        } else {
-            if (
-                $request->getMethod() != 'GET' 
-                || !in_array($entity, $supportedConditions)
-            ) {
-                throw new Exception('', 404);
-            }
         }
 
         switch ($entity) {
@@ -165,12 +162,14 @@ class WorkflowXHR extends AbstractController
             case 'source':
                 $allSources = $this->ticketService->getAllSources();
                 $results = [];
+
                 foreach ($allSources as $key => $source) {
                     $results[] = [
                                 'id'   => $key,
                                 'name' => $source,
                     ];
                 };
+
                 $json = json_encode($results);
                 $results = [];
                 break;
@@ -189,11 +188,6 @@ class WorkflowXHR extends AbstractController
                 break;
         }
 
-        // if (!empty($results)) {
-        //     $ignoredArray = ['__initializer__', '__cloner__', '__isInitialized__', 'description', 'color', 'company', 'createdAt', 'users', 'isActive'];
-        //     $json = $this->getSerializeObj($ignoredArray)->serialize($results, 'json');
-        // }
-
         return new Response(is_array($json) ? json_encode($json) : $json, 200, ['Content-Type' => 'application/json']);
     }
 
@@ -202,7 +196,7 @@ class WorkflowXHR extends AbstractController
         foreach ($this->workflowListnerService->getRegisteredWorkflowActions() as $workflowAction) {
             if ($workflowAction->getId() == $entity) {
                 $options = $workflowAction->getOptions($container);
-                
+
                 if (!empty($options)) {
                     return new Response(json_encode($options), 200, ['Content-Type' => 'application/json']);
                 }

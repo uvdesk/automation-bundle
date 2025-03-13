@@ -2,10 +2,6 @@
 
 namespace Webkul\UVDesk\AutomationBundle\Services;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Webkul\UVDesk\AutomationBundle\Workflow\FunctionalGroup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -13,25 +9,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AutomationService
 {
 	private $container;
-	private $requestStack;
-    private $entityManager;
+	private $translator;
 
-	public function __construct(ContainerInterface $container, RequestStack $requestStack, EntityManagerInterface $entityManager, TranslatorInterface $translator)
+
+	public function __construct(ContainerInterface $container, TranslatorInterface $translator)
 	{
 		$this->container = $container;
-		$this->requestStack = $requestStack;
-        $this->entityManager = $entityManager;
         $this->translator = $translator;
     }
 
     public function getWorkflowEvents()
     {
         return [
-            FunctionalGroup::USER => $this->translator->trans('User'),
-            FunctionalGroup::AGENT => $this->translator->trans('Agent'),
+            FunctionalGroup::USER     => $this->translator->trans('User'),
+            FunctionalGroup::EMAIL    => $this->translator->trans('Email'),
+            FunctionalGroup::AGENT    => $this->translator->trans('Agent'),
+            FunctionalGroup::TICKET   => $this->translator->trans('Ticket'),
             FunctionalGroup::CUSTOMER => $this->translator->trans('Customer'),
-            FunctionalGroup::TICKET => $this->translator->trans('Ticket'),
-            FunctionalGroup::EMAIL => $this->translator->trans('Email'),
         ];
     }
 
@@ -42,7 +36,7 @@ class AutomationService
         foreach ($this->container->get('uvdesk.automations.workflows')->getRegisteredWorkflowEvents() as $workflowDefinition) {
             $functionalGroup = $workflowDefinition->getFunctionalGroup();
 
-            if (!isset($ticketEventCollection[$functionalGroup])) {
+            if (! isset($ticketEventCollection[$functionalGroup])) {
                 $ticketEventCollection[$functionalGroup] = [];
             }
 
@@ -55,7 +49,7 @@ class AutomationService
     public function getWorkflowConditions()
     {
         $conditions = [
-            'ticket' => [
+            'ticket'   => [
                 'mail' => [
                     [
                         'lable' => $this->translator->trans('From Email'),

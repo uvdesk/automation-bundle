@@ -3,6 +3,10 @@ CHANGELOG for 1.1.x
 
 This changelog references any relevant changes introduced in 1.1 minor versions.
 
+* 1.1.4 (2025-03-13)
+    * Code Refractoring
+    * Improved codes and removed unused methods
+
 * 1.1.3 (2024-12-19)
    * License and support email address update.
    * Round robin ticket assignments update.

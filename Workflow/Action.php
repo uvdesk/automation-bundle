@@ -3,9 +3,7 @@
 namespace Webkul\UVDesk\AutomationBundle\Workflow;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\Loader\YamlFileLoader;
-use Symfony\Component\HttpFoundation\Request;
+use Webkul\UVDesk\AutomationBundle\Workflow\Event;
 
 abstract class Action
 {
@@ -25,5 +23,5 @@ abstract class Action
     }
 
     abstract public static function getOptions(ContainerInterface $container);
-    abstract public static function applyAction(ContainerInterface $container, $entity, $value);
+    abstract public static function applyAction(ContainerInterface $container, Event $event, $value);
 }

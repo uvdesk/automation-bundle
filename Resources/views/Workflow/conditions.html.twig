@@ -104,7 +104,7 @@
 			var objKey = ((typeof(sB.PrevEvent) != 'undefined' && sB.PrevEvent) ? sB.PrevEvent : 'ticket');
 			this.$el.html(this.selectTemplate(_.extend(this.model, {'keyNo': this.keyNo, 'conditions': sB.JsonConditions[objKey]})));
 
-			if (objKey == 'ticket' || objKey == 'task') {
+			if (objKey == 'ticket' || objKey == 'task' || objKey == 'email') {
 				$('#conditions').prev('.uv-hr').fadeIn(10);
 				$('#conditions').fadeIn(10);
 			} else {
@@ -133,10 +133,10 @@
 			this.siblingValue.find('.value-container, .uv-select, .form-group, .form-control, .input-group.date').remove();
 			if (dataMatch == 'string' || dataMatch == 'email' || dataMatch == 'number') {
 				this.siblingValue.prepend(this.valueTextTemplate(_.extend(this.model, {'addDate' : false, 'keyNo': this.keyNo})));
-			} else if(dataMatch == 'date' || dataMatch == 'datetime' || dataMatch == 'time') {
+			} else if (dataMatch == 'date' || dataMatch == 'datetime' || dataMatch == 'time') {
 				this.siblingValue.prepend(this.valueTextTemplate(_.extend(this.model, {'addDate' : true, 'fieldType': dataMatch, 'keyNo': this.keyNo})));
 				this.datePicker();
-			} else if(dataMatch == 'select') {
+			} else if (dataMatch == 'select') {
 				this.selectOpt.prop('disabled', true);
 				this.disable = true;
 				this.siblingValue.prepend(this.valueSelectTemplate(_.extend(this.model, {'keyNo': this.keyNo})));

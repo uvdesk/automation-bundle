@@ -2,25 +2,11 @@
 
 namespace Webkul\UVDesk\AutomationBundle\Workflow;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\Loader\YamlFileLoader;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\Event as EventDispatcherEvent;
 
-abstract class Event
+abstract class Event extends EventDispatcherEvent
 {
-    public static function getId()
-    {
-        return null;
-    }
-
-    public static function getDescription()
-    {
-        return null;
-    }
-
-    public static function getFunctionalGroup()
-    {
-        return null;
-    }
+    abstract public static function getId();
+    abstract public static function getDescription();
+    abstract public static function getFunctionalGroup();
 }

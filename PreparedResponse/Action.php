@@ -3,9 +3,6 @@
 namespace Webkul\UVDesk\AutomationBundle\PreparedResponse;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\Loader\YamlFileLoader;
-use Symfony\Component\HttpFoundation\Request;
 
 abstract class Action
 {

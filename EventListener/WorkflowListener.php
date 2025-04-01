@@ -3,32 +3,40 @@
 namespace Webkul\UVDesk\AutomationBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\EventDispatcher\GenericEvent;
-use Webkul\UVDesk\AutomationBundle\Entity\Workflow;
-use Webkul\UVDesk\CoreFrameworkBundle\Entity\Ticket;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Webkul\UVDesk\AutomationBundle\Workflow\Event as WorkflowEvent;
-use Webkul\UVDesk\AutomationBundle\Workflow\Action as WorkflowAction;
+use Webkul\UVDesk\AutomationBundle\Entity\Workflow;
+use Webkul\UVDesk\AutomationBundle\Workflow\Action;
+use Webkul\UVDesk\AutomationBundle\Workflow\Event;
+use Webkul\UVDesk\AutomationBundle\Workflow\Events as WorkflowEvents;
+use Webkul\UVDesk\CoreFrameworkBundle\Entity\Ticket;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\TicketService;
+use Webkul\UVDesk\CoreFrameworkBundle\Services\UserService;
+use UVDesk\CommunityPackages\UVDesk as UVDeskCommunityPackages;
+use Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events as CoreWorkflowEvents;
 
 class WorkflowListener
 {
     private $container;
     private $entityManager;
+    private $ticketService;
+    private $userService;
     private $registeredWorkflowEvents = [];
     private $registeredWorkflowActions = [];
 
-    public function __construct(ContainerInterface $container, EntityManagerInterface $entityManager)
+    public function __construct(ContainerInterface $container, EntityManagerInterface $entityManager, TicketService $ticketService, UserService $userService)
     {
         $this->container = $container;
         $this->entityManager = $entityManager;
+        $this->ticketService = $ticketService;
+        $this->userService = $userService;
     }
 
-    public function registerWorkflowEvent(WorkflowEvent $serviceTag)
+    public function registerWorkflowEvent(Event $serviceTag)
     {
         $this->registeredWorkflowEvents[] = $serviceTag;
     }
 
-    public function registerWorkflowAction(WorkflowAction $serviceTag)
+    public function registerWorkflowAction(Action $serviceTag)
     {
         $this->registeredWorkflowActions[] = $serviceTag;
     }
@@ -37,23 +45,6 @@ class WorkflowListener
     {
         foreach ($this->registeredWorkflowEvents as $workflowDefinition) {
             if ($workflowDefinition->getId() == $eventId) {
-                /*
-                    @NOTICE: Events 'uvdesk.agent.forgot_password', 'uvdesk.customer.forgot_password' will be deprecated 
-                    onwards uvdesk/automation-bundle:1.0.2 and uvdesk/core-framework:1.0.3 releases and will be 
-                    completely removed with the next major release.
-
-                    Both the events have been mapped to return the 'uvdesk.user.forgot_password' id, so we need to 
-                    return the correct definition.
-                */
-                if ('uvdesk.user.forgot_password' == $eventId) {
-                    if (
-                        $workflowDefinition instanceof \Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events\Agent\ForgotPassword 
-                        || $workflowDefinition instanceof \Webkul\UVDesk\CoreFrameworkBundle\Workflow\Events\Customer\ForgotPassword
-                    ) {
-                        continue;
-                    }
-                }
-
                 return $workflowDefinition;
             }
         }
@@ -71,24 +62,61 @@ class WorkflowListener
         return $this->registeredWorkflowActions;
     }
 
-    public function executeWorkflow(GenericEvent $event)
+    public function executeReplyEvent(Event $event) {
+        if ($this->userService->isFileExists('apps/uvdesk/report')) {
+            $reportServiceClass = UVDeskCommunityPackages\Report\Services\ReportService::class;
+            $reportService = new $reportServiceClass($this->entityManager, $this->container, $this->ticketService, $this->userService);
+
+            if (($event) instanceof CoreWorkflowEvents\Ticket\Status) {
+                $reportService->calculateResolveTime($event->getTicket());
+            } else if (
+                ($event) instanceof CoreWorkflowEvents\Ticket\AgentReply    ||
+                ($event) instanceof CoreWorkflowEvents\Ticket\CustomerReply ||
+                ($event) instanceof CoreWorkflowEvents\Ticket\CollaboratorReply
+            ) {
+                $thread = $event->getThread();
+
+                if (
+                    $thread 
+                    && $thread->getThreadType() == 'reply' 
+                    && ($thread->getCreatedBy() == 'agent' 
+                    || $thread->getCreatedBy() == 'customer')
+                ) {
+                    $reportService->calculateResponseTime($thread);
+                }
+            }
+        }
+    }
+
+    public function executeWorkflow($event)
     {
-        $workflowCollection = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows($event->getSubject());
+        if (! ($event instanceof Event))
+            return;
 
-        /*
-            @NOTICE: Events 'uvdesk.agent.forgot_password', 'uvdesk.customer.forgot_password' will be deprecated 
-            onwards uvdesk/automation-bundle:1.0.2 and uvdesk/core-framework:1.0.3 releases and will be 
-            completely removed with the next major release.
+        $workflowCollection = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows($event::getId());
 
-            From uvdesk/core-framework:1.0.3 onwards, instead of the above mentioned events, the one being 
-            triggered will be 'uvdesk.user.forgot_password'. Since there still might be older workflows 
-            configured to work on either of the two deprecated events, we will need to make an educated guess 
-            which one to use (if any) if there's none found for the actual event.
-        */
-        if (empty($workflowCollection) && 'uvdesk.user.forgot_password' == $event->getSubject()) {
+        if ((
+                $event instanceof CoreWorkflowEvents\Ticket\Create 
+                || $event instanceof CoreWorkflowEvents\Ticket\Priority
+            )
+            && $this->userService->isFileExists('apps/uvdesk/sla')
+        ) {
+            $slaServiceClass = UVDeskCommunityPackages\SLA\Services\SlaService::class;
+            $slaService = new $slaServiceClass($this->container, $this->entityManager );
+            $slaService->refreshTicketPolicies($event->getTicket());
+        }
+
+        if (($event) instanceof CoreWorkflowEvents\Ticket\Status) {
+            $this->executeReplyEvent($event);
+        }
+
+        if (empty($workflowCollection) && 'uvdesk.user.forgot_password' == $event::getId()) {
             $user = $event->getArgument('entity');
 
-            if (!empty($user) && $user instanceof \Webkul\UVDesk\CoreFrameworkBundle\Entity\User) {
+            if (
+                ! empty($user)
+                && $user instanceof \Webkul\UVDesk\CoreFrameworkBundle\Entity\User
+            ) {
                 $agentForgotPasswordWorkflows = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows('uvdesk.agent.forgot_password');
                 $customerForgotPasswordWorkflows = $this->entityManager->getRepository(Workflow::class)->getEventWorkflows('uvdesk.customer.forgot_password');
 
@@ -96,10 +124,16 @@ class WorkflowListener
                     $agentInstance = $user->getAgentInstance();
                     $customerInstance = $user->getCustomerInstance();
 
-                    if (!empty($customerForgotPasswordWorkflows) && !empty($customerInstance)) {
+                    if (
+                        ! empty($customerForgotPasswordWorkflows)
+                        && !empty($customerInstance)
+                    ) {
                         // Resort to uvdesk.customer.forgot_password workflows
                         $workflowCollection = $customerForgotPasswordWorkflows;
-                    } else if (!empty($agentForgotPasswordWorkflows) && !empty($agentInstance)) {
+                    } else if (
+                        ! empty($agentForgotPasswordWorkflows)
+                        && !empty($agentInstance)
+                    ) {
                         // Resort to uvdesk.agent.forgot_password workflows
                         $workflowCollection = $agentForgotPasswordWorkflows;
                     }
@@ -107,7 +141,7 @@ class WorkflowListener
             }
         }
         
-        if (!empty($workflowCollection)) {
+        if (! empty($workflowCollection)) {
             foreach ($workflowCollection as $workflow) {
                 $totalConditions = 0;
                 $totalEvaluatedConditions = 0;
@@ -115,13 +149,13 @@ class WorkflowListener
                 foreach ($this->evaluateWorkflowConditions($workflow) as $workflowCondition) {
                     $totalEvaluatedConditions++;
 
-                    if (isset($workflowCondition['type']) && $this->checkCondition($workflowCondition, $event->getArgument('entity'))) {
+                    if (isset($workflowCondition['type']) && $this->checkCondition($workflowCondition, $event)) {
                         $totalConditions++;
                     }
 
                     if (isset($workflowCondition['or'])) {
                         foreach ($workflowCondition['or'] as $orCondition) {
-                            if ($this->checkCondition($orCondition, $event->getArgument('entity'))) {
+                            if ($this->checkCondition($orCondition, $event)) {
                                 $totalConditions++;
                             }
                         }
@@ -129,7 +163,7 @@ class WorkflowListener
                 }
 
                 if ($totalEvaluatedConditions == 0 || $totalConditions >= $totalEvaluatedConditions) {
-                    $this->applyWorkflowActions($workflow, $event->getArgument('entity'), $event->hasArgument('thread') ? $event->getArgument('thread') : null);
+                    $this->applyWorkflowActions($workflow, $event);
                 }
             }
         }
@@ -145,7 +179,10 @@ class WorkflowListener
         }
 
         foreach ($workflow->getConditions() as $condition) {
-            if (!empty($condition['operation']) && $condition['operation'] != "&&") {
+            if (
+                ! empty($condition['operation'])
+                && $condition['operation'] != "&&"
+            ) {
                 if (!isset($finalConditions[$index]['or'])) {
                     $finalConditions[$index]['or'] = [];
                 }
@@ -160,7 +197,7 @@ class WorkflowListener
         return $workflowConditions;
     }
 
-    private function applyWorkflowActions(Workflow $workflow, $entity, $thread = null)
+    private function applyWorkflowActions(Workflow $workflow, Event $event)
     {
         foreach ($workflow->getActions() as $attributes) {
             if (empty($attributes['type'])) {
@@ -169,47 +206,93 @@ class WorkflowListener
 
             foreach ($this->getRegisteredWorkflowActions() as $workflowAction) {
                 if ($workflowAction->getId() == $attributes['type']) {
-                    $workflowAction->applyAction($this->container, $entity, isset($attributes['value']) ? $attributes['value'] : '', $thread);
+                    $workflowAction->applyAction($this->container, $event, isset($attributes['value']) ? $attributes['value'] : '');
                 }
             }
         }
     }
 
-    public function checkCondition($condition, $entity)
+    public function checkCondition($condition, Event $event)
     {
+        $entity = null;
+
+        switch (true) {
+            case $event instanceof WorkflowEvents\EmailActivity:
+                $entity = $event->getResolvedEmailHeaders();
+
+                break;
+            case $event instanceof WorkflowEvents\TicketActivity:
+                $entity = $event->getTicket();
+
+                break;
+            case $event instanceof WorkflowEvents\AgentActivity:
+            case $event instanceof WorkflowEvents\CustomerActivity:
+            case $event instanceof WorkflowEvents\UserActivity:
+                $entity = $event->getUser();
+
+                break;
+            default:
+                break;
+        }
+
+        if (empty($entity)) {
+            return false;
+        }
+
         switch ($condition['type']) {
             case 'from_mail':
-                if (isset($condition['value']) && $entity instanceof Ticket) {
-                    return $this->match($condition['match'], $entity->getCustomer()->getEmail(), $condition['value']);
+                if (isset($condition['value'])) {
+                    if ($entity instanceof Ticket) {
+                        return $this->match($condition['match'], $entity->getCustomer()->getEmail(), $condition['value']);
+                    } else if (
+                        is_array($entity) 
+                        && ! empty($entity['from'])
+                    ) {
+                        return $this->match($condition['match'], $entity['from'], $condition['value']);
+                    }
                 }
 
                 break;
             case 'to_mail':
-                if (isset($condition['value']) && $entity instanceof Ticket && $entity->getMailboxEmail()) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                    && $entity->getMailboxEmail()
+                ) {
                     return $this->match($condition['match'], $entity->getMailboxEmail(), $condition['value']);
                 }
-                
+
                 break;
             case 'subject':
-                if (isset($condition['value']) && ($entity instanceof Ticket || $entity instanceof Task)) {
+                if (
+                    isset($condition['value'])
+                    && ($entity instanceof Ticket || $entity instanceof Task)
+                ) {
                     return $this->match($condition['match'], $entity->getSubject(), $condition['value']);
                 }
 
                 break;
             case 'description':
-                if (isset($condition['value']) && $entity instanceof Ticket) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                ) {
                     $reply = $entity->createdThread->getMessage();
                     $reply = rtrim(strip_tags($reply), "\n" );
+
                     return $this->match($condition['match'], rtrim($reply), $condition['value']);
                 }
 
                 break;
             case 'subject_or_description':
-                if (isset($condition['value']) && $entity instanceof Ticket) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                ) {
                     $flag = $this->match($condition['match'], $entity->getSubject(), $condition['value']);
                     $createThread = $this->container->get('ticket.service')->getCreateReply($entity->getId(),false);
-                    
-                    if (!$flag) {
+
+                    if (! $flag) {
                         $createThread = $this->container->get('ticket.service')->getCreateReply($entity->getId(),false);
                         $createThread['reply'] = rtrim(strip_tags($createThread['reply']), "\n" );
 
@@ -221,72 +304,109 @@ class WorkflowListener
 
                 break;
             case 'TicketPriority':
-                if (isset($condition['value']) && ($entity instanceof Ticket)) {
+                if (
+                    isset($condition['value'])
+                    && ($entity instanceof Ticket)
+                ) {
                     return $this->match($condition['match'], $entity->getPriority()->getId(), $condition['value']);
                 }
 
                 break;
             case 'TicketType':
-                if (isset($condition['value']) && $entity instanceof Ticket) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                ) {
                     $typeId = $entity->getType() ? $entity->getType()->getId() : 0;
+
                     return $this->match($condition['match'], $typeId, $condition['value']);
                 }
 
                 break;
             case 'TicketStatus':
-                if (isset($condition['value']) && $entity instanceof Ticket) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                ) {
                     return $this->match($condition['match'], $entity->getStatus()->getId(), $condition['value']);
                 }
 
                 break;
             case 'stage':
-                if (isset($condition['value']) && $entity instanceof Task) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Task
+                ) {
                     return $this->match($condition['match'], $entity->getStage()->getId(), $condition['value']);
                 }
 
                 break;
             case 'source':
-                if (isset($condition['value']) && $entity instanceof Ticket) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                ) {
                     return $this->match($condition['match'], $entity->getSource(), $condition['value']);
                 }
 
                 break;
             case 'created':
-                if (isset($condition['value']) && ($entity instanceof Ticket || $entity instanceof Task)) {
+                if (
+                    isset($condition['value']) 
+                    && ($entity instanceof Ticket || $entity instanceof Task)
+                ) {
                     $date = date_format($entity->getCreatedAt(), "d-m-Y h:ia");
+
                     return $this->match($condition['match'], $date, $condition['value']);
                 }
 
                 break;
             case 'agent':
-                if (isset($condition['value']) && $entity instanceof Ticket && $entity->getAgent()) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                    && $entity->getAgent()
+                ) {
                     return $this->match($condition['match'], $entity->getAgent()->getId(), (($condition['value'] == 'actionPerformingAgent') ? ($this->container->get('user.service')->getCurrentUser() ? $this->container->get('user.service')->getCurrentUser()->getId() : 0) : $condition['value']));
                 }
 
                 break;
             case 'group':
-                if (isset($condition['value']) && $entity instanceof Ticket) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                ) {
                     $groupId = $entity->getSupportGroup() ? $entity->getSupportGroup()->getId() : 0;
+
                     return $this->match($condition['match'], $groupId, $condition['value']);
                 }
 
                 break;
             case 'team':
-                if (isset($condition['value']) && $entity instanceof Ticket) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                ) {
                     $subGroupId = $entity->getSupportTeam() ? $entity->getSupportTeam()->getId() : 0;
+
                     return $this->match($condition['match'], $subGroupId, $condition['value']);
                 }
 
                 break;
             case 'customer_name':
-                if (isset($condition['value']) && $entity instanceof Ticket) {
-                    $lastThread = $this->container->get('ticket.service')->getTicketLastThread($entity->getId());
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                ) { 
                     return $this->match($condition['match'], $entity->getCustomer()->getFullName(), $condition['value']);
                 }
                 
                 break;
             case 'customer_email':
-                if (isset($condition['value']) && $entity instanceof Ticket) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                ) {
                     return $this->match($condition['match'], $entity->getCustomer()->getEmail(), $condition['value']);
                 }
 
@@ -309,7 +429,10 @@ class WorkflowListener
                     }
                 }
 
-                if (isset($condition['value']) && $entity instanceof Ticket) {
+                if (
+                    isset($condition['value'])
+                    && $entity instanceof Ticket
+                ) {
                     return $this->match($condition['match'], !empty($value) ? $value : '', $condition['value']);
                 }
 

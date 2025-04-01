@@ -31,7 +31,7 @@ $ composer require uvdesk/automation-bundle
 License
 --------------
 
-The **UVDeskAutomationBundle** and libraries included within the bundle are released under the [OSL-3.0 license][3]
+The **UVDeskAutomationBundle** and libraries included within the bundle are released under the  [OSL-3.0 license][3]
 
 [1]: https://www.uvdesk.com/
 [2]: https://getcomposer.org/

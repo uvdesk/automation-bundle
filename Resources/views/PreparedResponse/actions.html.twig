@@ -111,7 +111,7 @@
 
 			var value = this.value = e.target.value;
 			if (typeof(sB.actionselectView) != 'undefined') {
-				sB.actionselectView.removeduplicate(e);
+				sB.actionselectView.removeDuplicate(e);
 			}
 
 			this.selectOpt = this.$el.find('.wfAction');
@@ -121,7 +121,7 @@
 
 			if (value == 'uvdesk.agent.add_note' || value == 'reply') {
 				this.siblingValue.prepend(this.valueTextTemplate(_.extend(this.model, {'keyNo': this.keyNo})));
-			} else if (value != 'uvdesk.ticket.delete' && value != 'uvdesk.ticket.mark_spam' && value) {
+			} else if (value != 'uvdesk.ticket.delete' && value != 'uvdesk.ticket.mark_spam' && value != 'uvdesk.ticket.round_robin_ticket_assignment' && value) {
 				this.selectOpt.prop('disabled', true);
 				this.disable = true;
 				if (value == 'cc' || value == 'bcc') {
@@ -212,7 +212,7 @@
 	        this.$(viewEl).find('.wfAction').trigger('change');
 	 		this.clearFirstTrSpan();
 		},
-		removeduplicate: function(e) {
+		removeDuplicate: function(e) {
 			//remove already exits elements - select
 		    $('.select-action').each(function() {
 				if(this.value == e.target.value)

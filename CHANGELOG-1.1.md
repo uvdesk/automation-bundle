@@ -3,6 +3,10 @@ CHANGELOG for 1.1.x
 
 This changelog references any relevant changes introduced in 1.1 minor versions.
 
+* 1.1.5 (2025-05-05)
+    * Update dashboard and search bar svg icon of workflows
+    * Code Refractoring
+
 * 1.1.4 (2025-03-13)
     * Code Refactoring
     * Improved codes and removed unused methods

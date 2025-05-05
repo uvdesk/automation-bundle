@@ -411,7 +411,7 @@ class WorkflowListener
                 }
 
                 break;
-            case strpos($condition['type'], 'customFields[') == 0:
+            case strpos($condition['type'], 'customFields') == 0:
                 $value = null;
                 $ticketCfValues = $entity->getCustomFieldValues()->getValues();
                 

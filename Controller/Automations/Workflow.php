@@ -104,11 +104,14 @@ class Workflow extends AbstractController
 
             if (empty($error)) {
                 // Check if new workflow and old one belong to the same class
-                $newWorkflow = !empty($workflow) && $workflow instanceof $workflowClass ? $workflow :new $workflowClass;
-
-                if (!empty($workflow)) {
-                    $entityManager->remove($workflow);
-                    $entityManager->flush();
+                if (!empty($workflow) && $workflow instanceof $workflowClass) {
+                    $newWorkflow = $workflow;
+                } else {
+                    $newWorkflow = new $workflowClass;
+                    if (!empty($workflow)) {
+                        $entityManager->remove($workflow);
+                        $entityManager->flush();
+                    }
                 }
 
                 $newWorkflow->setName($formData->get('name'));
@@ -122,14 +125,7 @@ class Workflow extends AbstractController
 
                 if ($newWorkflow->getWorkflowEvents()) {
                     foreach ($newWorkflow->getWorkflowEvents() as $newWorkflowEvent) {
-
-                        if (
-                            $thisKey = array_search(
-                        [
-                            'event'   => current($exNewEventEvent = explode('.', $newWorkflowEvent->getEvent())),
-                            'trigger' => end($exNewEventEvent)
-                        ], $formDataGetEvents)
-                        ) {
+                        if ($thisKey = array_search(['event' => current($exNewEventEvent = explode('.', $newWorkflowEvent->getEvent())), 'trigger' => end($exNewEventEvent)], $formDataGetEvents)) {
                             unset($formDataGetEvents[$thisKey]);
                         } else {
                             $entityManager->remove($newWorkflowEvent);
@@ -273,11 +269,14 @@ class Workflow extends AbstractController
 
             if (empty($error)) {
                 // Check if new workflow and old one belong to the same class
-                $newWorkflow = ! empty($workflow) && $workflow instanceof $workflowClass ? $workflow : new $workflowClass;
-
-                if (!empty($workflow)) {
-                    $entityManager->remove($workflow);
-                    $entityManager->flush();
+                if (! empty($workflow) && $workflow instanceof $workflowClass) {
+                    $newWorkflow = $workflow;
+                } else {
+                    $newWorkflow = new $workflowClass;
+                    if (!empty($workflow)) {
+                        $entityManager->remove($workflow);
+                        $entityManager->flush();
+                    }
                 }
 
                 $newWorkflow->setName($formData->get('name'));

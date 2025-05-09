@@ -9,13 +9,13 @@
     <a href="https://gitter.im/uvdesk/automation-bundle"><img src="https://badges.gitter.im/uvdesk/automation-bundle.svg" alt="connect on gitter"></a>
 </p>
 
-The **UVDeskAutomationBundle** introduces the ability to execute any special functionalities within your [UVDesk Community][1] helpdesk through the definition of events and actions, which can be futher automated by your support staff through the easily configurable Workflows and Prepared Responses.
+The **UVDeskAutomationBundle** enhances your [UVDesk Community][1] helpdesk by enabling the execution of custom functionalities through a robust system of events and actions. This allows support teams to automate routine tasks and streamline customer service operations using configurable Workflows and Prepared Responses, ultimately improving efficiency and response times.
 
 The automation bundle comes loaded with the following features:
 
-  * **Workflows** - Automatically execute any specific set of actions based on events trigged by the helpdesk system
+* **Workflows** - Automatically perform a defined set of actions whenever specific events—like ticket creation, status updates, or customer replies—are triggered within the helpdesk system. This streamlines repetitive tasks such as assigning agents, sending notifications, or updating ticket properties, improving efficiency and response consistency.
 
-  * **Prepared Responses** - Manually execute any specific set of actions from your helpdesk support panel
+* **Prepared Responses** - Manually trigger a specific set of predefined actions directly from your helpdesk support panel as needed. This allows agents to apply workflows—such as sending responses, updating ticket fields, or escalating issues—on demand for greater control and flexibility.
 
 Installation
 --------------

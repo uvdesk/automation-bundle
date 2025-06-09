@@ -92,7 +92,7 @@ class AutomationWorkflowFixtures extends DoctrineFixture
         ],
     ];
 
-    public function load(ObjectManager $entityManager)
+    public function load(ObjectManager $entityManager) : void
     {
         $availableWorkflows = $entityManager->getRepository(AutomationEntities\Workflow::class)->findAll();
 

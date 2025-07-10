@@ -7,7 +7,7 @@
                 <ul id="listPreparedResponses">
                     <input id="filterPreparedResponse" type="text" class="uv-search-inline">
                     <li>
-                        <a class="create-new" href="{{ path('prepare_response_action') }}" target="_blank" style="color: #2750C4">{{ 'Create New'|trans }}</a>
+                        <a class="create-new" href="{{ path('prepare_response_addaction') }}" target="_blank" style="color: #2750C4">{{ 'Create New'|trans }}</a>
                     </li>
                     
                     {% for preparedResponse in ticket_service.getManualWorkflow() %}
